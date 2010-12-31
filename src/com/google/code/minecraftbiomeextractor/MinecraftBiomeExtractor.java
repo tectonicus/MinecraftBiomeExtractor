@@ -1,23 +1,19 @@
 package com.google.code.minecraftbiomeextractor;
+
 import java.io.File;
 
-public class MinecraftBiomeExtractor {
-
-	/**
-	 * @param args
-	 */
+public class MinecraftBiomeExtractor
+{
 	public static void main(String[] args) 
 	{
-		//Schedule a job for the event dispatch thread:
-		//creating and showing this application's GUI.
-		
-		boolean nogui = false;
+		boolean noGui = false;
 		boolean flush = false;
 		boolean errorsOnly = false;
 		File jarLocation = null;
+		File outputDir = null;
 		boolean manualJarLocation = false;
-		boolean help = false;
-		File world_folder = null;
+		boolean showHelp = false;
+		File worldFolder = null;
 		
 		int i = 0;
 		while (i < args.length)
@@ -26,7 +22,7 @@ public class MinecraftBiomeExtractor {
 			
 			if (args[i].equalsIgnoreCase("-nogui"))
 			{
-				nogui = true;
+				noGui = true;
 			}
 			else if (args[i].equalsIgnoreCase("-flush"))
 			{
@@ -34,7 +30,7 @@ public class MinecraftBiomeExtractor {
 			}
 			else if (args[i].equalsIgnoreCase("-help") || args[i].equalsIgnoreCase("-?") || args[i].equalsIgnoreCase("?"))
 			{
-				help = true;
+				showHelp = true;
 			}
 			else if (args[i].equalsIgnoreCase("-quiet"))
 			{
@@ -49,52 +45,62 @@ public class MinecraftBiomeExtractor {
 				else
 					System.out.print("Minecraft jar location was invalid.");
 			}
+			else if (args[i].equalsIgnoreCase("-outputDir") && remaining > 0)
+			{
+				i++;
+				outputDir = new File(args[i]);
+			}
 			else
 			{
-				world_folder = new File(args[i]);
+				worldFolder = new File(args[i]);
 			}
 			
 			i++;
-			
 		}
 		
-		if (help)
+		if (outputDir == null)
+		{
+			outputDir = new File(worldFolder, "EXTRACTEDBIOMES");
+		}
+		
+		if (showHelp)
 		{
 			System.out.println("Minecraft Biome Extractor command line usage:");
 			System.out.println("\tjava -jar MinecraftBiomeExtractor.jar -nogui world_folder [-flush] [-quiet] [-jar jarloaction]");
 		}
-		else if (!nogui)
+		else if (!noGui)
 		{
 			MinecraftBiomeExtractorGUI.launchGUI();
 		}
 		else
 		{
-			if (world_folder.isDirectory())
+			if (worldFolder.isDirectory())
 			{
 				// Create a world processor and bind to minecraft
-				WorldProcessor world_processor = new WorldProcessor(null,errorsOnly,flush);
+				WorldProcessor worldProcessor = new WorldProcessor(null, errorsOnly, flush);
 				
 				if (manualJarLocation)
-					world_processor.setjarlocation(jarLocation);
+					worldProcessor.setjarlocation(jarLocation);
 				
-				boolean bound = world_processor.bindToMinecraft();
+				final boolean bound = worldProcessor.bindToMinecraft();
 				if (!bound)
 				{
 					System.out.print("Failed to bind to Minecraft, cannot generate biomes.\n" 
 							 + "Review the above messages to see if there's anything you can do about it.\n"
 							 + "If not, check online for a new version.");
-					return;
 				}
-				world_processor.setWorldFolder(world_folder);
-				world_processor.run();
+				else
+				{
+					worldProcessor.setWorldFolder(worldFolder);
+					worldProcessor.setOutputDir(outputDir);
+					worldProcessor.run();
+				}
 			}				
 			else
 			{
 				System.out.println("Error: world folder not found.");
-				return;
 			}
 		}
-
 	}
 
 }

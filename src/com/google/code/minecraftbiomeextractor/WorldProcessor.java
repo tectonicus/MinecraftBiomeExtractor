@@ -60,6 +60,9 @@ public class WorldProcessor implements Runnable {
 	private int chunk_min_z = 0;
 	private int chunk_max_z = 0;
 	
+	// Output
+	private File outputDir = null;
+	
 	// Internal class state variables
 	private boolean flush = false;
     boolean isServerJar = false;
@@ -129,13 +132,18 @@ public class WorldProcessor implements Runnable {
 		}
 	}
 	
+	public void setOutputDir(File dir)
+	{
+		this.outputDir = dir;
+	}
+	
 	public void setFlush(boolean flush)
 	{
 		this.flush = flush;
 	}
 	
-	public void run() {
-		
+	public void run()
+	{
 		// Reset some key variables
 		chunk_min_x = 0;
 		chunk_max_x = 0;
@@ -151,10 +159,17 @@ public class WorldProcessor implements Runnable {
 			printe("No world folder specified."+ newline);
 			return;
 		}
-			if((new File(world_folder,"EXTRACTEDBIOMES")).exists() && flush)
+		if (outputDir == null)
+		{
+			printe("No output dir specified\n");
+			return;
+		}
+		
+		//	if((new File(world_folder,"EXTRACTEDBIOMES")).exists() && flush)
+			if(outputDir.exists() && flush)
 			{
-				printm("Deleting existing biome data in " + world_folder.getName() + "..." + newline);
-				deleteDirectory(new File(world_folder,"EXTRACTEDBIOMES"));
+				printm("Deleting existing biome data in " + outputDir.getAbsolutePath() + newline);
+				deleteDirectory(outputDir);
 			}
 			
 			printm("Opening " + world_folder.getName() + "..." + newline);
@@ -172,11 +187,9 @@ public class WorldProcessor implements Runnable {
 			
 			printm("Calculating biome values..."+newline);
 			
-			
-			File biomesFolder = new File(world_folder,"EXTRACTEDBIOMES");
-			if (!(biomesFolder.exists() && biomesFolder.isDirectory()))
+			if (!(outputDir.exists() && outputDir.isDirectory()))
 			{	
-				if (!biomesFolder.mkdir())
+				if (!outputDir.mkdirs())
 				{
 					printe("No write access to world folder. Cannot continue."+newline);
 					return;
@@ -185,7 +198,7 @@ public class WorldProcessor implements Runnable {
 			
 			printm("Scanning save folder..." + newline);
 			
-			this.setupWorldBounds(world_folder,0);
+			this.setupWorldBounds(world_folder, 0);
 			printm("World Bounds: ( "+ Integer.toString(chunk_min_x) + " , " + Integer.toString(chunk_min_z) + " ) to ( " + Integer.toString(chunk_max_x) + " , " + Integer.toString(chunk_max_z) + " )" + newline);
 			printm("Saving biome data...  (press esc to cancel)" + newline);
 			
@@ -199,7 +212,7 @@ public class WorldProcessor implements Runnable {
 					int fromz = z*16;
 					int toz = (z+8)*16;
 					
-					File biomefile = new File(biomesFolder,Integer.toString(x)+"."+Integer.toString(z)+".biome");
+					File biomefile = new File(outputDir, Integer.toString(x)+"."+Integer.toString(z)+".biome");
 					
 					if (!biomefile.exists())
 					{
@@ -406,6 +419,7 @@ public class WorldProcessor implements Runnable {
 	}
 	
     private static final Class<?>[] parameters = new Class[]{URL.class};
+    
     /**
      * Adds the content pointed by the URL to the classpath.
      * @param u the URL pointing to the content to be added

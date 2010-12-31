@@ -31,7 +31,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel implements ActionListener
 		log.setCaretPosition(log.getDocument().getLength());
 	}
 	
-public MinecraftBiomeExtractorGUI()  {
+	public MinecraftBiomeExtractorGUI()  {
 	super(new BorderLayout());
 	
 	if (Os.isMac())
