@@ -3,11 +3,7 @@ package com.google.code.minecraftbiomeextractor;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Set;
+import java.util.Arrays;
 
 public class FileUtils
 {
@@ -59,12 +55,18 @@ public class FileUtils
 			File[] lhsEntries = lhsDir.listFiles();
 			File[] rhsEntries = rhsDir.listFiles();
 			
-			if (lhsEntries.length != rhsEntries.length)
-				return false;
+			Arrays.sort(lhsEntries);
+			Arrays.sort(rhsEntries);
+			
+		//	if (lhsEntries.length != rhsEntries.length)
+		//		return false;
 			
 			for (File lhs : lhsEntries)
 			{
 				boolean found = false;
+				
+				if (lhs.getName().equals(".svn"))
+					found = true;
 				
 				for (File rhs : rhsEntries)
 				{

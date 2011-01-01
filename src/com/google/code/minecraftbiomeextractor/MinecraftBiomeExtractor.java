@@ -80,7 +80,7 @@ public class MinecraftBiomeExtractor
 				WorldProcessor worldProcessor = new WorldProcessor(null, errorsOnly, flush);
 				
 				if (manualJarLocation)
-					worldProcessor.setjarlocation(jarLocation);
+					worldProcessor.setJarLocation(jarLocation);
 				
 				final boolean bound = worldProcessor.bindToMinecraft();
 				if (!bound)

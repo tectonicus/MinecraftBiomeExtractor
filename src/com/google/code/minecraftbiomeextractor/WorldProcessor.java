@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -22,13 +21,14 @@ import java.util.zip.ZipOutputStream;
 
 import javax.swing.filechooser.FileSystemView;
 
-public class WorldProcessor implements Runnable {
+public class WorldProcessor implements Runnable
+{
 	
-	static private final String newline = "\n";
+	private static final String NEW_LINE = "\n";
 	
-	static private final String saveclass_ref = "carg:class java.io.File carg:class java.lang.String +carg:class java.io.File carg:class java.lang.String carg:long +carg:class java.lang.String carg:class ox carg:long +carg:class cx carg:class ox +carg:class java.io.File carg:class java.lang.String carg:long carg:class ox +ret:void+arg:int arg:int arg:int ret:void+ret:void+arg:float ret:class+arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:boolean+arg:class ret:boolean+arg:class ret:void+ret:void+arg:int arg:int arg:int ret:float+arg:int arg:int arg:int arg:class ret:void+arg:class arg:class ret:interface java.util.List+arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:class ret:boolean+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class ret:boolean+arg:class arg:class ret:void+arg:int arg:int arg:int ret:class+arg:int arg:int ret:class+arg:class ret:void+arg:interface ju ret:void+ret:void+arg:float ret:float+arg:interface java.util.List ret:void+arg:int arg:int arg:int arg:int ret:void+arg:class ret:int+arg:int arg:int arg:int arg:int arg:int ret:boolean+ret:boolean+arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+arg:class arg:int arg:int arg:int arg:float ret:class+arg:class ret:void+ret:class+arg:class ret:interface bd+arg:int arg:int ret:int+arg:class ret:void+arg:boolean arg:interface ps ret:void+arg:int ret:boolean+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:boolean ret:int+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int ret:int+arg:class arg:class ret:class+arg:class arg:class arg:boolean ret:class+arg:class arg:class arg:float arg:float ret:void+arg:double arg:double arg:double arg:class arg:float arg:float ret:void+arg:class arg:int arg:int arg:int ret:void+arg:class arg:double arg:double arg:double arg:double arg:double arg:double ret:void+arg:class ret:boolean+arg:interface ju ret:void+arg:class arg:class ret:interface java.util.List+arg:float ret:int+arg:class arg:float ret:class+arg:class arg:boolean ret:void+arg:class ret:boolean+arg:class arg:class arg:class ret:boolean+arg:class arg:class ret:boolean+arg:class arg:double arg:double arg:double arg:float ret:void+arg:class arg:class ret:float+arg:class ret:class+arg:int arg:int arg:int arg:class ret:void+arg:interface ps ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int arg:boolean ret:void+arg:boolean ret:boolean+arg:class arg:class ret:interface java.util.List+arg:interface java.util.List ret:void+arg:int arg:int arg:int arg:int arg:boolean ret:boolean+arg:class arg:class arg:float ret:class+arg:class arg:class ret:class+arg:class arg:double ret:class+arg:double arg:double arg:double arg:double ret:class+arg:int arg:int arg:int arg:int arg:int arg:int arg:class ret:void+arg:long ret:void+arg:class arg:int arg:int arg:int ret:boolean+arg:class arg:byte ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int arg:int ret:void+arg:class ret:void+ret:class+arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:class+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:boolean+ret:void+ret:interface java.util.List+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:boolean+ret:void+arg:class ret:void+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int ret:int+arg:float ret:float+ret:void+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+arg:class ret:void+arg:int arg:int ret:int+ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:class+arg:int arg:int arg:int ret:boolean+ret:void+fld:boolean+fld:interface java.util.List+fld:interface java.util.List+fld:interface java.util.List+fld:class+fld:interface java.util.Set+fld:interface java.util.List+fld:interface java.util.List+fld:long+fld:long+fld:int+fld:int+fld:int+fld:boolean+fld:long+fld:int+fld:int+fld:class+fld:int+fld:int+fld:int+fld:boolean+fld:class+fld:interface java.util.List+fld:interface bd+fld:class+fld:class+fld:long+fld:class+fld:long+fld:class+fld:boolean+fld:class+fld:int+fld:int+fld:interface java.util.Set+fld:int+fld:interface java.util.List+fld:boolean+";
-	static private final String biomegenclass_ref = "+carg:class cx +arg:int arg:int ret:double+arg:int arg:int ret:class+arg:class ret:class+arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+";
-	static private final String serverrandclass_ref = "+ret:interface cg+ret:void+ret:void+arg:class ret:void+arg:int arg:int ret:boolean+arg:long arg:float ret:float+arg:int ret:class+arg:class ret:interface bd+fld:class+fld:class+fld:boolean+fld:boolean+fld:boolean+fld:class+fld:int+fld:class+";
+	private static final String SAVE_CLASS_REF = "carg:class java.io.File carg:class java.lang.String +carg:class java.io.File carg:class java.lang.String carg:long +carg:class java.lang.String carg:class ox carg:long +carg:class cx carg:class ox +carg:class java.io.File carg:class java.lang.String carg:long carg:class ox +ret:void+arg:int arg:int arg:int ret:void+ret:void+arg:float ret:class+arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:boolean+arg:class ret:boolean+arg:class ret:void+ret:void+arg:int arg:int arg:int ret:float+arg:int arg:int arg:int arg:class ret:void+arg:class arg:class ret:interface java.util.List+arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:class ret:boolean+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class ret:boolean+arg:class arg:class ret:void+arg:int arg:int arg:int ret:class+arg:int arg:int ret:class+arg:class ret:void+arg:interface ju ret:void+ret:void+arg:float ret:float+arg:interface java.util.List ret:void+arg:int arg:int arg:int arg:int ret:void+arg:class ret:int+arg:int arg:int arg:int arg:int arg:int ret:boolean+ret:boolean+arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+arg:class arg:int arg:int arg:int arg:float ret:class+arg:class ret:void+ret:class+arg:class ret:interface bd+arg:int arg:int ret:int+arg:class ret:void+arg:boolean arg:interface ps ret:void+arg:int ret:boolean+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:boolean ret:int+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int ret:int+arg:class arg:class ret:class+arg:class arg:class arg:boolean ret:class+arg:class arg:class arg:float arg:float ret:void+arg:double arg:double arg:double arg:class arg:float arg:float ret:void+arg:class arg:int arg:int arg:int ret:void+arg:class arg:double arg:double arg:double arg:double arg:double arg:double ret:void+arg:class ret:boolean+arg:interface ju ret:void+arg:class arg:class ret:interface java.util.List+arg:float ret:int+arg:class arg:float ret:class+arg:class arg:boolean ret:void+arg:class ret:boolean+arg:class arg:class arg:class ret:boolean+arg:class arg:class ret:boolean+arg:class arg:double arg:double arg:double arg:float ret:void+arg:class arg:class ret:float+arg:class ret:class+arg:int arg:int arg:int arg:class ret:void+arg:interface ps ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int arg:boolean ret:void+arg:boolean ret:boolean+arg:class arg:class ret:interface java.util.List+arg:interface java.util.List ret:void+arg:int arg:int arg:int arg:int arg:boolean ret:boolean+arg:class arg:class arg:float ret:class+arg:class arg:class ret:class+arg:class arg:double ret:class+arg:double arg:double arg:double arg:double ret:class+arg:int arg:int arg:int arg:int arg:int arg:int arg:class ret:void+arg:long ret:void+arg:class arg:int arg:int arg:int ret:boolean+arg:class arg:byte ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int arg:int ret:void+arg:class ret:void+ret:class+arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:class+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:boolean+ret:void+ret:interface java.util.List+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:boolean+ret:void+arg:class ret:void+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int ret:int+arg:float ret:float+ret:void+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+arg:class ret:void+arg:int arg:int ret:int+ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:class+arg:int arg:int arg:int ret:boolean+ret:void+fld:boolean+fld:interface java.util.List+fld:interface java.util.List+fld:interface java.util.List+fld:class+fld:interface java.util.Set+fld:interface java.util.List+fld:interface java.util.List+fld:long+fld:long+fld:int+fld:int+fld:int+fld:boolean+fld:long+fld:int+fld:int+fld:class+fld:int+fld:int+fld:int+fld:boolean+fld:class+fld:interface java.util.List+fld:interface bd+fld:class+fld:class+fld:long+fld:class+fld:long+fld:class+fld:boolean+fld:class+fld:int+fld:int+fld:interface java.util.Set+fld:int+fld:interface java.util.List+fld:boolean+";
+	private static final String BIOME_GEN_CLASS_REF = "+carg:class cx +arg:int arg:int ret:double+arg:int arg:int ret:class+arg:class ret:class+arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+";
+	private static final String SERVER_RAND_CLASS_REF = "+ret:interface cg+ret:void+ret:void+arg:class ret:void+arg:int arg:int ret:boolean+arg:long arg:float ret:float+arg:int ret:class+arg:class ret:interface bd+fld:class+fld:class+fld:boolean+fld:boolean+fld:boolean+fld:class+fld:int+fld:class+";
 	
 	private MinecraftBiomeExtractorGUI gui = null;
 	
@@ -37,28 +37,28 @@ public class WorldProcessor implements Runnable {
 	private ArrayList<String> class_listing;
 	private ArrayList<String> class_signatures;
 	private boolean useGUI = true;
-	private Class<?> MINECRAFTSAVECLASS;
-	private Class<?> BIOMEGENERATORCLASS;
+	private Class<?> minecraftSaveClass;
+	private Class<?> biomeGeneratorClass;
 	private Constructor<?> createMinecraftSave;
 	private Constructor<?> createBiomeGenerator;
 	private Method generateForLoaction;
     private Field loadedField = null;
     private Field genTemp;
     private Field genMoist;
-    private Object MinecraftSave;
-    private Object BiomeGenerator;
-    private Object arglist[]; // Used to call the biome generator.
+    private Object minecraftSave;
+    private Object biomeGenerator;
+	private Object argList[]; // Used to call the biome generator.
     
     // Storage for the grasscolor and foliagecolor pngs
-	private BufferedImage grasscolorimage = null;
-	private BufferedImage foliagecolorimage = null;
+	private BufferedImage grassColourImage = null;
+	private BufferedImage foliageColourImage = null;
 	
 	// World Variables
-	private File world_folder = null;
-	private int chunk_min_x = 0;
-	private int chunk_max_x = 0;
-	private int chunk_min_z = 0;
-	private int chunk_max_z = 0;
+	private File worldFolder = null;
+	private int chunkMinX = 0;
+	private int chunkMaxX = 0;
+	private int chunkMinZ = 0;
+	private int chunkMaxZ = 0;
 	
 	// Output
 	private File outputDir = null;
@@ -67,8 +67,8 @@ public class WorldProcessor implements Runnable {
 	private boolean flush = false;
     boolean isServerJar = false;
 	private boolean errorsOnly = false;
-	private int last_percent = 0;
-	private int count_percents = 0;
+	private int lastPercent = 0;
+	private int countPercents = 0;
 	
 	private boolean bound = false;	// Is set to true if the extractor bound to Minecraft properly
 	private boolean die = false;  	// Set to true to abort the process if run in a separate thread.
@@ -84,7 +84,7 @@ public class WorldProcessor implements Runnable {
 	
 	public WorldProcessor(MinecraftBiomeExtractorGUI gui, final boolean errorsOnly, final boolean flush)
 	{
-		if (gui==null)
+		if (gui == null)
 			useGUI = false;
 		else
 			this.gui = gui;
@@ -99,11 +99,11 @@ public class WorldProcessor implements Runnable {
 	private void setupBiomeGenArgs()
 	{
         // Setup a parameter array we'll use later when invoking it
-        arglist = new Object[4];
-        arglist[0] = new Integer(0);
-        arglist[1] = new Integer(0);
-        arglist[2] = new Integer(1);
-        arglist[3] = new Integer(1);
+        argList = new Object[4];
+        argList[0] = Integer.valueOf(0);
+        argList[1] = Integer.valueOf(0);
+        argList[2] = Integer.valueOf(1);
+        argList[3] = Integer.valueOf(1);
 	}
 	
 	public boolean isBound()
@@ -121,13 +121,13 @@ public class WorldProcessor implements Runnable {
 	{
 		if (world_folder.exists() && world_folder.isDirectory())
 		{
-			this.world_folder = world_folder;
+			this.worldFolder = world_folder;
 			return true;
 		}
 		else
 		{
-			printe("World folder does not exist." + newline);
-			this.world_folder = null;
+			printe("World folder does not exist." + NEW_LINE);
+			this.worldFolder = null;
 			return false;
 		}
 	}
@@ -145,114 +145,116 @@ public class WorldProcessor implements Runnable {
 	public void run()
 	{
 		// Reset some key variables
-		chunk_min_x = 0;
-		chunk_max_x = 0;
-		chunk_min_z = 0;
-		chunk_max_z = 0;
+		chunkMinX = 0;
+		chunkMaxX = 0;
+		chunkMinZ = 0;
+		chunkMaxZ = 0;
 		die = false;
-		last_percent = 0;
-		count_percents = 0;
+		lastPercent = 0;
+		countPercents = 0;
 		
 		// Make sure the world folder has been specified.
-		if (world_folder == null)
+		if (worldFolder == null)
 		{
-			printe("No world folder specified."+ newline);
+			printe("No world folder specified."+ NEW_LINE);
 			return;
 		}
+		
 		if (outputDir == null)
 		{
 			printe("No output dir specified\n");
 			return;
 		}
 		
-		//	if((new File(world_folder,"EXTRACTEDBIOMES")).exists() && flush)
-			if(outputDir.exists() && flush)
-			{
-				printm("Deleting existing biome data in " + outputDir.getAbsolutePath() + newline);
-				deleteDirectory(outputDir);
-			}
-			
-			printm("Opening " + world_folder.getName() + "..." + newline);
-			this.setupDataFolder(world_folder.getAbsolutePath());
+		if (outputDir.exists() && flush)
+		{
+			printm("Deleting existing biome data in " + outputDir.getAbsolutePath() + NEW_LINE);
+			FileUtils.deleteDirectory(outputDir);
+		}
+	
+		printm("Opening " + worldFolder.getName() + "..." + NEW_LINE);
+		this.setupDataFolder(worldFolder.getAbsolutePath());
 
-			printm("Locating Minecraft save..."+newline);
-			if (!this.loadWorld())
-			{
-				printe("Minecraft classes failed to load the world."+ newline);
-				return;
-			}
+		printm("Locating Minecraft save..."+NEW_LINE);
+		if (!this.loadWorld())
+		{
+			printe("Minecraft classes failed to load the world."+ NEW_LINE);
+			return;
+		}
 			
 			byte[] data = new byte[32768];
 			byte[] coords = new byte[2];
 			
-			printm("Calculating biome values..."+newline);
+			printm("Calculating biome values..."+NEW_LINE);
 			
 			if (!(outputDir.exists() && outputDir.isDirectory()))
 			{	
 				if (!outputDir.mkdirs())
 				{
-					printe("No write access to world folder. Cannot continue."+newline);
+					printe("No write access to world folder. Cannot continue."+NEW_LINE);
 					return;
 				}
 			}
 			
-			printm("Scanning save folder..." + newline);
+			printm("Scanning save folder..." + NEW_LINE);
 			
-			this.setupWorldBounds(world_folder, 0);
-			printm("World Bounds: ( "+ Integer.toString(chunk_min_x) + " , " + Integer.toString(chunk_min_z) + " ) to ( " + Integer.toString(chunk_max_x) + " , " + Integer.toString(chunk_max_z) + " )" + newline);
-			printm("Saving biome data...  (press esc to cancel)" + newline);
+			this.setupWorldBounds(worldFolder, 0);
+			printm("World Bounds: ( "+ Integer.toString(chunkMinX) + " , " + Integer.toString(chunkMinZ) + " ) to ( " + Integer.toString(chunkMaxX) + " , " + Integer.toString(chunkMaxZ) + " )" + NEW_LINE);
+			printm("Saving biome data...  (press esc to cancel)" + NEW_LINE);
 			
-			for (int x = (chunk_min_x/8-1)*8; x<=((chunk_max_x/8)*8); x=x+8)
+			for (int x = (chunkMinX/8-1)*8; x<=((chunkMaxX/8)*8); x=x+8)
 			{
-				for (int z = (chunk_min_z/8-1)*8; z<=((chunk_max_z/8)*8); z=z+8)
+				for (int z = (chunkMinZ/8-1)*8; z<=((chunkMaxZ/8)*8); z=z+8)
 				{
 					
-					int fromx = x*16;
-					int tox = (x+8)*16;
-					int fromz = z*16;
-					int toz = (z+8)*16;
+					final int fromX = x*16;
+					final int toX = (x+8)*16;
+					final int fromZ = z*16;
+					final int toZ = (z+8)*16;
 					
-					File biomefile = new File(outputDir, Integer.toString(x)+"."+Integer.toString(z)+".biome");
+					File biomeFile = new File(outputDir, Integer.toString(x)+"."+Integer.toString(z)+".biome");
 					
-					if (!biomefile.exists())
+					if (!biomeFile.exists())
 					{
-						for(int i = fromx; i < tox; i++)
+						for(int i = fromX; i < toX; i++)
 						{
-							for(int j = fromz; j < toz; j++)
+							for(int j = fromZ; j < toZ; j++)
 							{	
 								coords = getCoordsAtBlock(i,j);
-								data[2*(i-fromx)+(j-fromz)*256] = coords[1];
-								data[2*(i-fromx)+1+(j-fromz)*256] = coords[0];
+								data[2*(i-fromX)+(j-fromZ)*256] = coords[1];
+								data[2*(i-fromX)+1+(j-fromZ)*256] = coords[0];
 							}
 						}
 					
 						// Write out the biome data here.
 			            FileOutputStream fileoutputstream;
-						try {
-							fileoutputstream = new FileOutputStream(biomefile);
+						try
+						{
+							fileoutputstream = new FileOutputStream(biomeFile);
 							fileoutputstream.write(data, 0, 32768);
 				            fileoutputstream.close();
-						} catch (Throwable e) {
-							printe("A biome file failed to write. Stopping."+newline);
-							
+						}
+						catch (Throwable e)
+						{
+							printe("A biome file failed to write. Stopping."+NEW_LINE);
 							return;
 						}
 					}
 					
 					// Progress Report (so the user doesn't get too anxious, this can take forever)
-					int iteration = (z-chunk_min_z) + (x-chunk_min_x)*(chunk_max_z-chunk_min_z);
-					int total_iteration = (chunk_max_x-chunk_min_x)*(chunk_max_z-chunk_min_z);
-					int percent = (int)(((float)iteration/(float)total_iteration)*100);
+					final int iteration = (z-chunkMinZ) + (x-chunkMinX) * (chunkMaxZ-chunkMinZ);
+					final int totalIteration = (chunkMaxX-chunkMinX)*(chunkMaxZ-chunkMinZ);
+					int percent = (int)(((float)iteration/(float)totalIteration)*100);
 					if (percent > 100)
 						percent = 100;
-					if (percent-last_percent >= 1)
+					if (percent-lastPercent >= 1)
 					{
-						if (count_percents%10 == 0)
-							printm(newline);
-						printm(Integer.toString((int)(((float)iteration/(float)total_iteration)*100))+"% ... ");
+						if (countPercents%10 == 0)
+							printm(NEW_LINE);
+						printm(Integer.toString((int)(((float)iteration/(float)totalIteration)*100))+"% ... ");
 						
-						last_percent = (int)(((float)iteration/(float)total_iteration)*100);
-						count_percents++;
+						lastPercent = (int)(((float)iteration/(float)totalIteration)*100);
+						countPercents++;
 					}
 					if (die)
 						break;
@@ -262,23 +264,19 @@ public class WorldProcessor implements Runnable {
 			}
 			if (!die)
 			{
-				
-				printm(newline+newline+"Done! This world is now ready to be used with a biome-capable"+newline);
-				printm("mapping program such as mcmap. If your boundaries expand, you will need"+newline);
-				printm("to come back and re-process. (It will be much faster the second time)"+newline+newline);
-				printm("You may now exit or select another world to process."+newline+newline);
-				
+				printm(NEW_LINE+NEW_LINE+"Done! This world is now ready to be used with a biome-capable"+NEW_LINE);
+				printm("mapping program such as mcmap. If your boundaries expand, you will need"+NEW_LINE);
+				printm("to come back and re-process. (It will be much faster the second time)"+NEW_LINE+NEW_LINE);
+				printm("You may now exit or select another world to process."+NEW_LINE+NEW_LINE);
 			}
 			else
 			{
-				
-				printm(newline+"Operation safely cancelled (progress saved)."+newline+newline);
-				printm("You may now exit or select another world to process."+newline+newline);
-				
+				printm(NEW_LINE+"Operation safely cancelled (progress saved)."+NEW_LINE+NEW_LINE);
+				printm("You may now exit or select another world to process."+NEW_LINE+NEW_LINE);
 			}
 		}
 	
-	private void printm(String msg)
+	private void printm(final String msg)
 	{
 		if (!errorsOnly)
 		{
@@ -287,10 +285,9 @@ public class WorldProcessor implements Runnable {
 			else
 				System.out.print(msg);
 		}
-				
 	}
 	
-	private void printe(String msg)
+	private void printe(final String msg)
 	{
 		if (useGUI)
 			gui.message(msg);
@@ -301,196 +298,148 @@ public class WorldProcessor implements Runnable {
 	public boolean loadWorld()
 	{
 		// Creating the Minecraft Save object
-		Object saveargs[] = new Object[2];
-        saveargs[0] = world_folder;
-        saveargs[1] = "";
+		Object saveArgs[] = new Object[2];
+        saveArgs[0] = worldFolder;
+        saveArgs[1] = "";
         
-		Object saveargs2[] = new Object[4];
-        saveargs2[0] = world_folder;
-        saveargs2[1] = "";
-        saveargs2[2] = 0L;
-        saveargs2[3] = null;
+		Object saveArgs2[] = new Object[4];
+        saveArgs2[0] = worldFolder;
+        saveArgs2[1] = "";
+        saveArgs2[2] = 0L;
+        saveArgs2[3] = null;
       
-		try {
+		try
+		{
 			if (isServerJar)
-				MinecraftSave = createMinecraftSave.newInstance(saveargs2);
+				minecraftSave = createMinecraftSave.newInstance(saveArgs2);
 			else
-				MinecraftSave = createMinecraftSave.newInstance(saveargs);
-		} catch (IllegalArgumentException e1) {
-			printe("Minecraft Save object rejected arguments!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+				minecraftSave = createMinecraftSave.newInstance(saveArgs);
+		}
+		catch (IllegalArgumentException e1)
+		{
+			printe("Minecraft Save object rejected arguments!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
-		} catch (InstantiationException e1) {
-			printe("Minecraft Save object failed to instantiate!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+		}
+		catch (InstantiationException e1)
+		{
+			printe("Minecraft Save object failed to instantiate!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
-		} catch (IllegalAccessException e1) {
-			printe("Minecraft Save object missing!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+		}
+		catch (IllegalAccessException e1)
+		{
+			printe("Minecraft Save object missing!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
-		} catch (InvocationTargetException e1) {
-			printe("Minecraft Save object invocation failed!"+newline);
-			printe("Minecraft version was incompatible."+newline);
+		}
+		catch (InvocationTargetException e1)
+		{
+			printe("Minecraft Save object invocation failed!"+NEW_LINE);
+			printe("Minecraft version was incompatible."+NEW_LINE);
 			return false;
 		}
 		
 		if (loadedField != null)
 		{
-			try {
-				if(! loadedField.getBoolean(MinecraftSave))
+			try
+			{
+				if (!loadedField.getBoolean(minecraftSave))
 				{
-					printm("Level Loaded!"+newline);
+					printm("Level Loaded!"+NEW_LINE);
 				}
 				else
 				{
-					printe("Level failed to load!"+newline);
+					printe("Level failed to load!"+NEW_LINE);
 					return false;
 				}
-			} catch (IllegalArgumentException e2) {
-				printe("Couldn't check if save loaded."+newline);
-				printm("Things might not work."+newline);
-			} catch (IllegalAccessException e2) {
-				printe("Couldn't check if save loaded."+newline);
-				printm("Things might not work."+newline);
+			}
+			catch (IllegalArgumentException e2)
+			{
+				printe("Couldn't check if save loaded."+NEW_LINE);
+				printm("Things might not work."+NEW_LINE);
+			}
+			catch (IllegalAccessException e2)
+			{
+				printe("Couldn't check if save loaded."+NEW_LINE);
+				printm("Things might not work."+NEW_LINE);
 			}
 		}
 	
 		// Creating the Biome Generator using the minecraft save object
-		Object biogenargs[] = new Object[1];
-		biogenargs[0] = MinecraftSave;
-		try {
-			BiomeGenerator = createBiomeGenerator.newInstance(biogenargs);
-		} catch (IllegalArgumentException e1) {
-			printe("BiomeGen constructor rejected arguments!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+		Object bioGenArgs[] = new Object[1];
+		bioGenArgs[0] = minecraftSave;
+		try
+		{
+			biomeGenerator = createBiomeGenerator.newInstance(bioGenArgs);
+		}
+		catch (IllegalArgumentException e1)
+		{
+			printe("BiomeGen constructor rejected arguments!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
-		} catch (InstantiationException e1) {
-			printe("BiomeGen object failed to instantiate!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+		}
+		catch (InstantiationException e1)
+		{
+			printe("BiomeGen object failed to instantiate!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
-		} catch (IllegalAccessException e1) {
-			printe("BiomeGen object missing!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+		}
+		catch (IllegalAccessException e1)
+		{
+			printe("BiomeGen object missing!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
-		} catch (InvocationTargetException e1) {
-			printe("BiomeGen object invocation failed!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+		}
+		catch (InvocationTargetException e1)
+		{
+			printe("BiomeGen object invocation failed!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
 		}
 		return true;
 	}
 
 	// Setup the min/max chunk values for the currently selected world
-	private void setupWorldBounds(File start,int level)
+	private void setupWorldBounds(File start, int level)
 	{
 		level++;
 		if (level > 3)
 			return;
 		File[] listing = start.listFiles();
 		String[] parts;
-		for(int i=0;i<listing.length;i++)
+		for(int i=0; i<listing.length; i++)
 		{
 			if (listing[i].isDirectory() && !listing[i].getName().startsWith(".") && !listing[i].getName().equalsIgnoreCase("DIM-1"))
+			{
 				setupWorldBounds(listing[i],level);
+			}
 			else if (listing[i].getName().endsWith(".dat") && level==3)
 			{
 				// Decode X,Z and place in max,mins
 				parts = listing[i].getName().split("\\.");
 				if (parts.length>2)
 				{
-					int x = Integer.parseInt(parts[1], 36);
-					int z = Integer.parseInt(parts[2], 36);
+					final int x = Integer.parseInt(parts[1], 36);
+					final int z = Integer.parseInt(parts[2], 36);
 					
-					if (java.lang.Math.abs(x) < 4096 && java.lang.Math.abs(z)< 4096)
+					if (Math.abs(x) < 4096 && Math.abs(z) < 4096)
 					{
-						if (x<chunk_min_x)
-							chunk_min_x = x;
-						if (x>chunk_max_x)
-							chunk_max_x = x;
-						if (z<chunk_min_z)
-							chunk_min_z = z;
-						if (z>chunk_max_z)
-							chunk_max_z = z;
-						
+						if (x<chunkMinX)
+							chunkMinX = x;
+						if (x>chunkMaxX)
+							chunkMaxX = x;
+						if (z<chunkMinZ)
+							chunkMinZ = z;
+						if (z>chunkMaxZ)
+							chunkMaxZ = z;
 					}
 				}
 			}
 		}
 	}
 	
-    private static final Class<?>[] parameters = new Class[]{URL.class};
-    
-    /**
-     * Adds the content pointed by the URL to the classpath.
-     * @param u the URL pointing to the content to be added
-     * @throws IOException
-     */
-    private static void addJarToClasspath(File jarfile) throws IOException {
-    	URL u = jarfile.toURI().toURL();
-        URLClassLoader sysloader = (URLClassLoader)ClassLoader.getSystemClassLoader();
-        Class<?> sysclass = URLClassLoader.class;
-        try {
-            Method method = sysclass.getDeclaredMethod("addURL",parameters);
-            method.setAccessible(true);
-            method.invoke(sysloader,new Object[]{ u }); 
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new IOException("Error, could not add URL to system classloader");
-        }      
-    }
-    
- // Given a class name, this function creates a string which
-    // characterizes the class's structure without including
-    // any names.
-    private static String generateClassSignature(String classname)
-    {   
-    	String signature = new String("");
-         try {
-             Class<?> cls = Class.forName(classname);
-          
-             Constructor<?> ctorlist[] = cls.getDeclaredConstructors();
-                            for (int i = 0; i < ctorlist.length; i++) 
-                            {
-                                  Constructor<?> ct = ctorlist[i];
-                                  Class<?> pvec[] = ct.getParameterTypes();
-                                  for (int j = 0; j < pvec.length; j++)
-                                	  signature = signature + "carg:" + pvec[j].toString()+" ";
-                                  signature = signature + "+";
-                               }
-             
-             
-              Method methlist[]  = cls.getDeclaredMethods();
-              for (int i = 0; i < methlist.length; i++) {  
-                 Method m = methlist[i];
-                 Class<?> pvec[] = m.getParameterTypes();
-                 for (int j = 0; j < pvec.length; j++)
-                 {
-                	 if (pvec[j].toString().startsWith("class"))
-                		 signature = signature + "arg:class" + " ";
-                	 else
-                		 signature = signature + "arg:" + pvec[j].toString() + " ";
-                 }
-            	 if (m.getReturnType().toString().startsWith("class"))
-	                 signature = signature + "ret:class" + "+";
-            	 else
-            		 signature = signature + "ret:" + m.getReturnType().toString() + "+";
-              }
-                 
-                 Field fieldlist[] = cls.getDeclaredFields();
-                 for (int i = 0; i < fieldlist.length; i++) 
-                 {
-                	 Field fld = fieldlist[i];
-                	 if (fld.getType().toString().startsWith("class"))
-                			 signature = signature + "fld:class" + "+";
-                	 else
-                		 signature = signature + "fld:" + fld.getType().toString() + "+";
-                 }
-           }
-           catch (Throwable e) {
-              //System.err.println(e);
-           }
-    	return signature;
-    }
+    static final Class<?>[] parameters = new Class[] { URL.class };
     
     // If no EXTRACTEDBIOMES folder exists, make one.
     // Copy in grasscolor.png and foliagecolor.png
@@ -501,23 +450,23 @@ public class WorldProcessor implements Runnable {
 		{	
 			if (!biomesFolder.mkdir())
 			{
-				printm("No write access to world folder. Cannot continue."+newline);
+				printm("No write access to world folder. Cannot continue."+NEW_LINE);
 				
 				return;
 			}
 		}
 		
 		try {
-			if (grasscolorimage != null)
+			if (grassColourImage != null)
 			{
-				ImageIO.write(grasscolorimage, "png", new File(biomesFolder,"grasscolor.png"));
+				ImageIO.write(grassColourImage, "png", new File(biomesFolder,"grasscolor.png"));
 			}
-			if (foliagecolorimage != null)
+			if (foliageColourImage != null)
 			{
-				ImageIO.write(foliagecolorimage, "png", new File(biomesFolder,"foliagecolor.png"));
+				ImageIO.write(foliageColourImage, "png", new File(biomesFolder,"foliagecolor.png"));
 			}
 		} catch (IOException e) {
-			printm("Failed to write biome color pngs. Continuing..."+newline);
+			printm("Failed to write biome color pngs. Continuing..."+NEW_LINE);
 		}
     }
     
@@ -607,79 +556,76 @@ public class WorldProcessor implements Runnable {
     	return peak_index;
     }
     
-    // A quick recursive function to delete a directory
-	// Found it online. Thanks... whoever. I am sorry I forgot
-	// your name!
-	  static private boolean deleteDirectory(File path) {
-		    if( path.exists() ) {
-		      File[] files = path.listFiles();
-		      for(int i=0; i<files.length; i++) {
-		         if(files[i].isDirectory()) {
-		           deleteDirectory(files[i]);
-		         }
-		         else {
-		           files[i].delete();
-		         }
-		      }
-		    }
-		    return( path.delete() );
-		  }
 	  
 	/*
 	 * The manual API
 	 */
-	  public double getTemperatureAtBlock(int x, int z) // Returns the temperature (double)
+	  public double getTemperatureAtBlock(final int x, final int z) // Returns the temperature (double)
 	  {
-		  	arglist[0] = x;
-			arglist[1] = z;
-			try {
-				generateForLoaction.invoke(BiomeGenerator, arglist);  // BiomeGenerator.a(i,j,1,1);
-			} catch (Throwable e1) {
-				printe("Could not generate biome vals for coords..."+newline);
+		  	argList[0] = x;
+			argList[1] = z;
+			try
+			{
+				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
+			}
+			catch (Throwable e1)
+			{
+				printe("Could not generate biome vals for coords..."+NEW_LINE);
 			} 
 			
-			try {
-				return ((double[])genTemp.get(BiomeGenerator))[0]; // BiomeGenerator.a[0];
-			} catch (Throwable e) {
-				printe("Could not extract temp from generator"+newline);
+			try
+			{
+				return ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
+			}
+			catch (Throwable e)
+			{
+				printe("Could not extract temp from generator"+NEW_LINE);
 				return 0;
 			}
 	  }
-	  public double getMoistureAtBlock(int x, int z) // Returns the moisture (double)
+	  
+	  public double getMoistureAtBlock(final int x, final int z) // Returns the moisture (double)
 	  {
-		  	arglist[0] = x;
-			arglist[1] = z;
-			try {
-				generateForLoaction.invoke(BiomeGenerator, arglist);  // BiomeGenerator.a(i,j,1,1);
-			} catch (Throwable e1) {
-				printe("Could not generate biome vals for coords..."+newline);
+		  	argList[0] = x;
+			argList[1] = z;
+			try
+			{
+				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
+			}
+			catch (Throwable e1)
+			{
+				printe("Could not generate biome vals for coords..."+NEW_LINE);
 			} 
 			
-			try {
-				return ((double[])genMoist.get(BiomeGenerator))[0]; // BiomeGenerator.b[0];
-			} catch (Throwable e) {
-				printe("Could not extract moist from generator"+newline);
+			try
+			{
+				return ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
+			}
+			catch (Throwable e)
+			{
+				printe("Could not extract moist from generator"+NEW_LINE);
 				return 0;
 			}
 	  }
-	  public byte[] getCoordsAtBlock(int x, int z) // Returns the location of the biome color in the 256x256 biome PNG (an int)
+	  
+	  public byte[] getCoordsAtBlock(final int x, final int z) // Returns the location of the biome color in the 256x256 biome PNG (an int)
 	  {
-		  	arglist[0] = x;
-			arglist[1] = z;
+		  	argList[0] = x;
+			argList[1] = z;
 			byte[] coords = new byte[2];
 			coords[0] = 0;
 			coords[1] = 0;
 			try {
-				generateForLoaction.invoke(BiomeGenerator, arglist);  // BiomeGenerator.a(i,j,1,1);
+				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
 			} catch (Throwable e1) {
-				printe("Could not generate biome vals for coords..."+newline);
+				printe("Could not generate biome vals for coords..."+NEW_LINE);
 			} 
 			double temp,moisture;
 			try {
-				temp = ((double[])genTemp.get(BiomeGenerator))[0]; // BiomeGenerator.a[0];
-				moisture = ((double[])genMoist.get(BiomeGenerator))[0]; // BiomeGenerator.b[0];
+				temp = ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
+				moisture = ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
 			} catch (Throwable e) {
-				printe("Could not extract temp/moist from generator"+newline);
+				printe("Could not extract temp/moist from generator"+NEW_LINE);
 				return coords;
 			}
 			
@@ -689,14 +635,14 @@ public class WorldProcessor implements Runnable {
 			coords[1] = (byte) ((1.0D - moisture) * 255.0D);
 			return coords;
 	  }
-	  public int getRGBAtBlock(int x, int z, int type) // Returns a Color (or an int for efficiency) of the biome color at a given block
+	  public int getRGBAtBlock(final int x, final int z, final int type) // Returns a Color (or an int for efficiency) of the biome color at a given block
 	  {
 		  	byte[] coords = getCoordsAtBlock(x,z);
 		  	//System.out.print("("+Byte.toString(coords[0])+","+Byte.toString(coords[1])+")");
 			if (type == 0)
-				return grasscolorimage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
+				return grassColourImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
 			else if (type == 1)
-				return foliagecolorimage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
+				return foliageColourImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
 			else
 				return 0;
 	  }
@@ -705,17 +651,17 @@ public class WorldProcessor implements Runnable {
 		  	return new Color(getRGBAtBlock(x,z,type));
 	  }
 	  
-	public boolean setBiomeImages(File grasscolor, File foliagecolor)
+	public boolean setBiomeImages(final File grasscolor, final File foliagecolor)
 	{
 			try 
 			{
 				if (grasscolor != null)
 				{
-					grasscolorimage = ImageIO.read(grasscolor);
+					grassColourImage = ImageIO.read(grasscolor);
 				}
 				if (foliagecolor != null)
 				{
-					foliagecolorimage = ImageIO.read(foliagecolor);
+					foliageColourImage = ImageIO.read(foliagecolor);
 				}
 			} 
 			catch (IOException e) 
@@ -725,7 +671,7 @@ public class WorldProcessor implements Runnable {
 		return true;
 	}
 	
-	public void setjarlocation(File mjar)
+	public void setJarLocation(File mjar)
 	{
 		minecraftJar = mjar;
 	}
@@ -754,7 +700,7 @@ public class WorldProcessor implements Runnable {
 			minecraftFolderPath = new File(FileSystemView.getFileSystemView().getHomeDirectory(),".minecraft");
 		}
 		
-		printm("Discovering minecraft.jar interface..."+newline);
+		printm("Discovering minecraft.jar interface..."+NEW_LINE);
 		minecraftJar = new File(new File(minecraftFolderPath,"bin"),"minecraft.jar");
 	}
 	
@@ -780,9 +726,9 @@ public class WorldProcessor implements Runnable {
 		ZipFile mcjar;
 		if (!minecraftJar.exists())
 		{
-			printe("Failed to locate minecraft.jar"+newline);
-			printe("Path: " + minecraftJar.getAbsolutePath() +newline);
-			printe("Minecraft doesn't appear to be installed!"+newline);
+			printe("Failed to locate minecraft.jar"+NEW_LINE);
+			printe("Path: " + minecraftJar.getAbsolutePath() +NEW_LINE);
+			printe("Minecraft doesn't appear to be installed!"+NEW_LINE);
 
 			return false;
 		}
@@ -805,11 +751,11 @@ public class WorldProcessor implements Runnable {
 				
 				if (grasscolor != null)
 				{
-					grasscolorimage = ImageIO.read(mcjar.getInputStream(grasscolor));
+					grassColourImage = ImageIO.read(mcjar.getInputStream(grasscolor));
 				}
 				if (foliagecolor != null)
 				{
-					foliagecolorimage = ImageIO.read(mcjar.getInputStream(foliagecolor));
+					foliageColourImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
 				}
                 
 				ZipEntry mojang1 = mcjar.getEntry("META-INF/MOJANG_C.DSA");
@@ -850,34 +796,34 @@ public class WorldProcessor implements Runnable {
 					minecraftJar.delete();
 					(new File(minecraftJar.getAbsolutePath()+".new")).renameTo(minecraftJar);
 					
-					printm("Removed MOJANG signatures."+newline);
+					printm("Removed MOJANG signatures."+NEW_LINE);
 				}
 				
 			} catch (ZipException e1) {
 				System.out.println(currentfile.getName());
 				e1.printStackTrace();
-                printe("Failed to extract file from zip:" + currentfile.getName() +newline);
+                printe("Failed to extract file from zip:" + currentfile.getName() +NEW_LINE);
 				
 			} catch (IOException e1) {
 				e1.printStackTrace();
-                printe("Failed to open new jar for writing!"+newline);
+                printe("Failed to open new jar for writing!"+NEW_LINE);
 				
 			}
 		}
 		
 		try {
-			addJarToClasspath(minecraftJar);
+			ClasspathUtil.addJarToClasspath(minecraftJar);
 		} catch (IOException e) {
-			printe("I can't seem to find your minecraft.jar file!"+newline);
+			printe("I can't seem to find your minecraft.jar file!"+NEW_LINE);
 		}
 		
 		// The classes, methods, and fields we need, as strings:
 		// Classes
 		String save_class = "cu";
-		String save_class_signature = saveclass_ref;
+		String save_class_signature = SAVE_CLASS_REF;
 		
 		String biome_gen_class = "pb";
-		String biome_gen_class_signature = biomegenclass_ref;
+		String biome_gen_class_signature = BIOME_GEN_CLASS_REF;
 		
 		// Methods
 		// This is unlikely to change so I don't need to detect it.
@@ -897,7 +843,7 @@ public class WorldProcessor implements Runnable {
 		
 		for (int i = 0; i<class_listing.size();i++)
 		{
-			class_signatures.add(generateClassSignature(class_listing.get(i)));
+			class_signatures.add(ReflectionUtil.generateClassSignature(class_listing.get(i)));
 			
 			// Dump all the class signatures - helpful!
 			//System.out.println(class_listing.get(i));
@@ -909,17 +855,17 @@ public class WorldProcessor implements Runnable {
 		if (class_id != -1)
 		{
 			save_class = class_listing.get(class_id);
-			printm("Save class is: "+save_class+newline);
+			printm("Save class is: "+save_class+NEW_LINE);
 		}
 		else
 		{
-			printe(newline + "Deobfuscation of minecraft.jar failed."+newline);
-			printe("Signature match for save class not found."+newline);
-			printe("Class listing ("+ Integer.toString(class_listing.size()) + "entires)" + newline);
+			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
+			printe("Signature match for save class not found."+NEW_LINE);
+			printe("Class listing ("+ Integer.toString(class_listing.size()) + "entires)" + NEW_LINE);
 			
 			for (int i=0; i<class_listing.size(); i++)
 			{
-				printe("\t"+ class_listing.get(i) + ".class" + newline);
+				printe("\t"+ class_listing.get(i) + ".class" + NEW_LINE);
 			}
 			return false;
 		}
@@ -928,24 +874,24 @@ public class WorldProcessor implements Runnable {
 		if (class_id != -1)
 		{
 			biome_gen_class = class_listing.get(class_id);
-			printm("Biome Gen class is: "+biome_gen_class+newline);
+			printm("Biome Gen class is: "+biome_gen_class+NEW_LINE);
 		}
 		else
 		{
-			printe("Deobfuscation of minecraft.jar failed."+newline);
-			printe("Signature match for biome gen class not found."+newline);
+			printe("Deobfuscation of minecraft.jar failed."+NEW_LINE);
+			printe("Signature match for biome gen class not found."+NEW_LINE);
 			return false;
 		}
 	
 		// Get the classes we need using reflection
 		
 		try {
-			MINECRAFTSAVECLASS = Class.forName(save_class);
-			BIOMEGENERATORCLASS = Class.forName(biome_gen_class);
+			minecraftSaveClass = Class.forName(save_class);
+			biomeGeneratorClass = Class.forName(biome_gen_class);
 		} catch (ClassNotFoundException e2) {
-			printe("Can't find Minecraft! Looked here:"+newline);
-			printe(minecraftJar.getAbsolutePath()+newline);
-			printe("Make certain minecraft.jar is in that location."+newline);
+			printe("Can't find Minecraft! Looked here:"+NEW_LINE);
+			printe(minecraftJar.getAbsolutePath()+NEW_LINE);
+			printe("Make certain minecraft.jar is in that location."+NEW_LINE);
 			return false;
 		}
 		
@@ -956,43 +902,43 @@ public class WorldProcessor implements Runnable {
         partypes[1] = String.class;
         
 		try {
-			createMinecraftSave = MINECRAFTSAVECLASS.getConstructor(partypes);
+			createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
 		} catch (SecurityException e1) {
-			printe("Could not bind MinecraftSave Constructor (security issue)"+newline);
-			printe("I'm trying to delete the Mojang signatures for you."+newline);
-			printe("Restart the program and try again."+newline);
+			printe("Could not bind MinecraftSave Constructor (security issue)"+NEW_LINE);
+			printe("I'm trying to delete the Mojang signatures for you."+NEW_LINE);
+			printe("Restart the program and try again."+NEW_LINE);
 			return false;
 		} catch (NoSuchMethodException e1) {
 			
 			// This could mean that you are operating on a server JAR. Try this:
 			try {
-				printm("Looks like this might be a server JAR. Keep trying..."+newline);
+				printm("Looks like this might be a server JAR. Keep trying..."+NEW_LINE);
 				partypes = new Class[4];
 		        partypes[0] = File.class;
 		        partypes[1] = String.class;
 		        partypes[2] = Long.TYPE;
-				partypes[3] = Class.forName(class_listing.get(this.matchClassSignature(serverrandclass_ref)));
-				createMinecraftSave = MINECRAFTSAVECLASS.getConstructor(partypes);
+				partypes[3] = Class.forName(class_listing.get(this.matchClassSignature(SERVER_RAND_CLASS_REF)));
+				createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
 				isServerJar = true;
 			} catch (Throwable e) {
-				printe("Could not bind MinecraftSave Constructor for servers."+newline);
-				printe("Minecraft version was incompatible"+newline);
+				printe("Could not bind MinecraftSave Constructor for servers."+NEW_LINE);
+				printe("Minecraft version was incompatible"+NEW_LINE);
 				return false;
 			}
 		}
 		
         // Setup the BIOMEGENERATORCLASS constructor
 		partypes = new Class[1];
-        partypes[0] = MINECRAFTSAVECLASS;
+        partypes[0] = minecraftSaveClass;
         try {
-			createBiomeGenerator = BIOMEGENERATORCLASS.getConstructor(partypes);
+			createBiomeGenerator = biomeGeneratorClass.getConstructor(partypes);
 		} catch (SecurityException e1) {
-			printe("Could not bind BiomeGenerator Constructor (security issue)"+newline);
-			printe("Minecraft version was incompatible"+newline);
+			printe("Could not bind BiomeGenerator Constructor (security issue)"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
 		} catch (NoSuchMethodException e1) {
-			printe("Could not bind BiomeGenerator Constructor"+newline);
-			printe("Minecraft version was incompatible"+newline);
+			printe("Could not bind BiomeGenerator Constructor"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
 		}
 		
@@ -1000,13 +946,13 @@ public class WorldProcessor implements Runnable {
 		save_notloaded = getFieldWithType(save_class, save_notloaded_type, save_notloaded_count);
 
 		try {
-			loadedField = MINECRAFTSAVECLASS.getField(save_notloaded);
+			loadedField = minecraftSaveClass.getField(save_notloaded);
 		} catch (SecurityException e2) {
-			printe("Couldn't check if save loaded."+newline);
-			printm("Trying anyway..."+newline);
+			printe("Couldn't check if save loaded."+NEW_LINE);
+			printm("Trying anyway..."+NEW_LINE);
 		} catch (NoSuchFieldException e2) {
-			printe("Couldn't check if save loaded."+newline);
-			printm("Trying anyway..."+newline);
+			printe("Couldn't check if save loaded."+NEW_LINE);
+			printm("Trying anyway..."+NEW_LINE);
 		}
 		
 		 // Binding the method that generates the biomes
@@ -1019,31 +965,31 @@ public class WorldProcessor implements Runnable {
         
         // Create the method object
 		try {
-			generateForLoaction = BIOMEGENERATORCLASS.getMethod(biome_generator, partypes);
+			generateForLoaction = biomeGeneratorClass.getMethod(biome_generator, partypes);
 		} catch (SecurityException e1) {
-			printe("Failed to setup biogen method!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+			printe("Failed to setup biogen method!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
 		} catch (NoSuchMethodException e1) {
-			printe("Failed to setup biogen method!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+			printe("Failed to setup biogen method!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
 		}
 		
         // Binding the fields that read out the temperature and moisture
 		try {
-			genTemp = BIOMEGENERATORCLASS.getField(biome_gen_temp);
-			genMoist = BIOMEGENERATORCLASS.getField(biome_gen_moist);
+			genTemp = biomeGeneratorClass.getField(biome_gen_temp);
+			genMoist = biomeGeneratorClass.getField(biome_gen_moist);
 		} catch (SecurityException e1) {
-			printe("Failed to setup temp/moist fields!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+			printe("Failed to setup temp/moist fields!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
 		} catch (NoSuchFieldException e1) {
-			printe("Failed to setup temp/moist fields!"+newline);
-			printe("Minecraft version was incompatible"+newline);
+			printe("Failed to setup temp/moist fields!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
 			return false;
 		}
-		printm("Ready!"+newline+newline);
+		printm("Ready!"+NEW_LINE+NEW_LINE);
 		
 		bound = true;
 		return true;
