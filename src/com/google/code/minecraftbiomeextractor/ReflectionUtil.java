@@ -64,4 +64,30 @@ public class ReflectionUtil
 		return signature;
 	}
 	
+	// This function attempts to make matching plain fields in a class easier.
+	// Basically, you give it a type and a number fcount and if will find the
+	// fcount-th field with that type.
+	public static String getFieldWithType(final String className, final String tpe, final int fcount)
+	{
+		int count = 0;
+		try
+		{
+			Class<?> clazz = Class.forName(className);
+			Field fieldlist[] = clazz.getDeclaredFields();
+			for (int i = 0; i < fieldlist.length; i++)
+			{
+				Field fld = fieldlist[i];
+				if (fld.getType().toString().equals(tpe))
+				{
+					count++;
+					if (count == fcount)
+						return fld.getName();
+				}
+			}
+		}
+		catch (Throwable e) {}
+		
+		return "";
+	}
+	
 }

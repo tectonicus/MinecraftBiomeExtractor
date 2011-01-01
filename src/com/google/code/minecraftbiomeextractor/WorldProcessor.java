@@ -1,4 +1,5 @@
 package com.google.code.minecraftbiomeextractor;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -11,7 +12,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
@@ -439,7 +439,7 @@ public class WorldProcessor implements Runnable
 		}
 	}
 	
-    static final Class<?>[] parameters = new Class[] { URL.class };
+    
     
     // If no EXTRACTEDBIOMES folder exists, make one.
     // Copy in grasscolor.png and foliagecolor.png
@@ -469,32 +469,6 @@ public class WorldProcessor implements Runnable
 			printm("Failed to write biome color pngs. Continuing..."+NEW_LINE);
 		}
     }
-    
-    // This function attempts to make matching plain fields in a class easier.
-    // Basically, you give it a type and a number fcount and if will find the
-    // fcount-th field with that type.
-    private String getFieldWithType(String classname, String tpe, int fcount)
-    {
-    	int count = 0;
-         try {
-        	 Class<?> cls = Class.forName(classname);
-             Field fieldlist[] = cls.getDeclaredFields();
-             for (int i = 0; i < fieldlist.length; i++) 
-             {
-            	 Field fld = fieldlist[i];
-            	 if (fld.getType().toString().equals(tpe))
-            	 {
-            		 count++;
-            		 if (count == fcount)
-            			 return fld.getName();
-            	 }
-             }
-       }
-       catch (Throwable e) {
-       }
-       return "";
-    }
-    
     
     // Given a signature that came out of generateSignatures at some point in the past
     // find the best match of the classes loaded from the minecraft.jar.
@@ -646,10 +620,11 @@ public class WorldProcessor implements Runnable
 			else
 				return 0;
 	  }
-	  public Color getColorAtBlock(int x, int z, int type) // Returns a Color (or an int for efficiency) of the biome color at a given block
-	  {
-		  	return new Color(getRGBAtBlock(x,z,type));
-	  }
+	  
+	public Color getColorAtBlock(final int x, final int z, final int type) // Returns a Color (or an int for efficiency) of the biome color at a given block
+	{
+		return new Color(getRGBAtBlock(x, z, type));
+	}
 	  
 	public boolean setBiomeImages(final File grasscolor, final File foliagecolor)
 	{
@@ -943,7 +918,7 @@ public class WorldProcessor implements Runnable
 		}
 		
 		// Setup the save class loaded field
-		save_notloaded = getFieldWithType(save_class, save_notloaded_type, save_notloaded_count);
+		save_notloaded = ReflectionUtil.getFieldWithType(save_class, save_notloaded_type, save_notloaded_count);
 
 		try {
 			loadedField = minecraftSaveClass.getField(save_notloaded);

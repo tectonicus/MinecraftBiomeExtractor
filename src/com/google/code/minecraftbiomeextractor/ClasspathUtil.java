@@ -9,6 +9,8 @@ import java.net.URLClassLoader;
 public class ClasspathUtil
 {
 
+	private static final Class<?>[] parameters = new Class[] { URL.class };
+	
 	/**
 	 * Adds the content pointed by the URL to the classpath.
 	 * 
@@ -23,7 +25,7 @@ public class ClasspathUtil
 		Class<?> sysClass = URLClassLoader.class;
 		try
 		{
-			Method method = sysClass.getDeclaredMethod("addURL", WorldProcessor.parameters);
+			Method method = sysClass.getDeclaredMethod("addURL", parameters);
 			method.setAccessible(true);
 			method.invoke(sysLoader, new Object[] { u });
 		}
