@@ -12,7 +12,7 @@ public class ReflectionUtil
 	// any names.
 	public static String generateClassSignature(final String className)
 	{
-		String signature = new String("");
+		String signature = "";
 		try
 		{
 			Class<?> clazz = Class.forName(className);
@@ -24,9 +24,9 @@ public class ReflectionUtil
 				Class<?> pvec[] = ct.getParameterTypes();
 				for (int j = 0; j < pvec.length; j++)
 				{
-					signature = signature + "carg:" + pvec[j].toString() + " ";
+					signature += "carg:" + pvec[j].toString() + " ";
 				}
-				signature = signature + "+";
+				signature += "+";
 			}
 			
 			Method methlist[] = clazz.getDeclaredMethods();
@@ -37,14 +37,14 @@ public class ReflectionUtil
 				for (int j = 0; j < pvec.length; j++)
 				{
 					if (pvec[j].toString().startsWith("class"))
-						signature = signature + "arg:class" + " ";
+						signature += "arg:class" + " ";
 					else
-						signature = signature + "arg:" + pvec[j].toString() + " ";
+						signature += "arg:" + pvec[j].toString() + " ";
 				}
 				if (m.getReturnType().toString().startsWith("class"))
-					signature = signature + "ret:class" + "+";
+					signature += "ret:class" + "+";
 				else
-					signature = signature + "ret:" + m.getReturnType().toString() + "+";
+					signature += "ret:" + m.getReturnType().toString() + "+";
 			}
 			
 			Field fieldList[] = clazz.getDeclaredFields();
@@ -52,9 +52,9 @@ public class ReflectionUtil
 			{
 				Field field = fieldList[i];
 				if (field.getType().toString().startsWith("class"))
-					signature = signature + "fld:class" + "+";
+					signature += "fld:class" + "+";
 				else
-					signature = signature + "fld:" + field.getType().toString() + "+";
+					signature += "fld:" + field.getType().toString() + "+";
 			}
 		}
 		catch (Throwable e)
@@ -69,14 +69,16 @@ public class ReflectionUtil
 	// fcount-th field with that type.
 	public static String getFieldWithType(final String className, final String tpe, final int fcount)
 	{
-		int count = 0;
 		try
 		{
+			int count = 0;
+			
 			Class<?> clazz = Class.forName(className);
-			Field fieldlist[] = clazz.getDeclaredFields();
-			for (int i = 0; i < fieldlist.length; i++)
+		//	Field fieldlist[] = clazz.getDeclaredFields();
+		//	for (int i = 0; i < fieldlist.length; i++)
+			for (Field fld : clazz.getDeclaredFields())
 			{
-				Field fld = fieldlist[i];
+		//		Field fld = fieldlist[i];
 				if (fld.getType().toString().equals(tpe))
 				{
 					count++;

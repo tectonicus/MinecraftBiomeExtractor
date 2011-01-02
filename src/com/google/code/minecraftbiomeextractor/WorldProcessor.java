@@ -34,7 +34,7 @@ public class WorldProcessor implements Runnable
 	
 	// Minecraft Class Bindings
 	private File minecraftJar = null;
-	private ArrayList<String> class_listing;
+	private ArrayList<String> classListing;
 	private ArrayList<String> class_signatures;
 	private boolean useGUI = true;
 	private Class<?> minecraftSaveClass;
@@ -443,7 +443,7 @@ public class WorldProcessor implements Runnable
     
     // If no EXTRACTEDBIOMES folder exists, make one.
     // Copy in grasscolor.png and foliagecolor.png
-    private void setupDataFolder(String worldpath)
+    private void setupDataFolder(final String worldpath)
     {
     	File biomesFolder = new File(worldpath,"EXTRACTEDBIOMES");
 		if (!(biomesFolder.exists() && biomesFolder.isDirectory()))
@@ -456,7 +456,8 @@ public class WorldProcessor implements Runnable
 			}
 		}
 		
-		try {
+		try
+		{
 			if (grassColourImage != null)
 			{
 				ImageIO.write(grassColourImage, "png", new File(biomesFolder,"grasscolor.png"));
@@ -465,7 +466,9 @@ public class WorldProcessor implements Runnable
 			{
 				ImageIO.write(foliageColourImage, "png", new File(biomesFolder,"foliagecolor.png"));
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			printm("Failed to write biome color pngs. Continuing..."+NEW_LINE);
 		}
     }
@@ -589,16 +592,22 @@ public class WorldProcessor implements Runnable
 			byte[] coords = new byte[2];
 			coords[0] = 0;
 			coords[1] = 0;
-			try {
+			try
+			{
 				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
-			} catch (Throwable e1) {
+			}
+			catch (Throwable e1)
+			{
 				printe("Could not generate biome vals for coords..."+NEW_LINE);
 			} 
-			double temp,moisture;
-			try {
+			double temp, moisture;
+			try
+			{
 				temp = ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
 				moisture = ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
-			} catch (Throwable e) {
+			}
+			catch (Throwable e)
+			{
 				printe("Could not extract temp/moist from generator"+NEW_LINE);
 				return coords;
 			}
@@ -609,7 +618,9 @@ public class WorldProcessor implements Runnable
 			coords[1] = (byte) ((1.0D - moisture) * 255.0D);
 			return coords;
 	  }
-	  public int getRGBAtBlock(final int x, final int z, final int type) // Returns a Color (or an int for efficiency) of the biome color at a given block
+	  
+	  // Returns the biome color at a given block, packed in an int as RGB
+	  public int getRGBAtBlock(final int x, final int z, final int type)
 	  {
 		  	byte[] coords = getCoordsAtBlock(x,z);
 		  	//System.out.print("("+Byte.toString(coords[0])+","+Byte.toString(coords[1])+")");
@@ -621,7 +632,8 @@ public class WorldProcessor implements Runnable
 				return 0;
 	  }
 	  
-	public Color getColorAtBlock(final int x, final int z, final int type) // Returns a Color (or an int for efficiency) of the biome color at a given block
+	// Returns the biome color at a given block
+	public Color getColorAtBlock(final int x, final int z, final int type)
 	{
 		return new Color(getRGBAtBlock(x, z, type));
 	}
@@ -651,34 +663,6 @@ public class WorldProcessor implements Runnable
 		minecraftJar = mjar;
 	}
 	
-	private void autodetectMinecraft()
-	{
-		File minecraftFolderPath;
-		// Figure out what platform this is.
-		String os = System.getProperty("os.name").toLowerCase();
-		if (os.indexOf( "mac" ) >= 0)
-		{
-			minecraftFolderPath = new File(FileSystemView.getFileSystemView().getHomeDirectory(),"Library");
-			minecraftFolderPath = new File(minecraftFolderPath,"Application Support");
-			minecraftFolderPath = new File(minecraftFolderPath,"minecraft");
-		}
-		else if (os.indexOf( "win" ) >= 0)
-		{
-			minecraftFolderPath = new File(System.getenv("APPDATA"),".minecraft");
-		}
-		else if (os.indexOf( "nix") >=0 || os.indexOf( "nux") >=0)
-		{
-			minecraftFolderPath = new File(FileSystemView.getFileSystemView().getHomeDirectory(),".minecraft");
-		}
-	    else
-		{
-			minecraftFolderPath = new File(FileSystemView.getFileSystemView().getHomeDirectory(),".minecraft");
-		}
-		
-		printm("Discovering minecraft.jar interface..."+NEW_LINE);
-		minecraftJar = new File(new File(minecraftFolderPath,"bin"),"minecraft.jar");
-	}
-	
 	public boolean bindToMinecraft()
 	{
 		// This method kind of crazy. 
@@ -693,13 +677,15 @@ public class WorldProcessor implements Runnable
 		//		based on signatures
 		// 8.) Bind the classes and functions we need to reflection variables
 		
-		if (minecraftJar==null)
+		// Auto find minecraft jar if we don't have one explicitly set
+		if (minecraftJar == null)
 		{
-			autodetectMinecraft();
+			printm("Discovering minecraft.jar interface..."+NEW_LINE);
+			minecraftJar = MinecraftUtils.findMinecraftJar( MinecraftUtils.findMinecraftDir() );
 		}
 		
-		ZipFile mcjar;
-		if (!minecraftJar.exists())
+		// Check minecraft jar looks valid
+		if (minecraftJar == null || !minecraftJar.exists())
 		{
 			printe("Failed to locate minecraft.jar"+NEW_LINE);
 			printe("Path: " + minecraftJar.getAbsolutePath() +NEW_LINE);
@@ -707,88 +693,97 @@ public class WorldProcessor implements Runnable
 
 			return false;
 		}
-		else
-		{
-			class_listing = new ArrayList<String>();
-			ZipEntry currentfile = null;
-			try {
-				
-				// Setup the data buffer for copying stuff.
-				int count;
-				int BUFFER = 2048;
-				byte data[] = new byte[BUFFER];
-				
-				mcjar = new ZipFile(minecraftJar);
-				
-				// Copy grasscolor.png and foliagecolor.png
-				ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
-				ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
-				
-				if (grasscolor != null)
-				{
-					grassColourImage = ImageIO.read(mcjar.getInputStream(grasscolor));
-				}
-				if (foliagecolor != null)
-				{
-					foliageColourImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
-				}
-                
-				ZipEntry mojang1 = mcjar.getEntry("META-INF/MOJANG_C.DSA");
-				boolean needs_sig_removed = (mojang1 != null);
-				
-				Enumeration<? extends ZipEntry> e = mcjar.entries();
-				
-				FileOutputStream dest = new FileOutputStream(new File(minecraftJar.getAbsolutePath()+".new"));
-				ZipOutputStream zout = null;
-				if (needs_sig_removed)
-					zout = new ZipOutputStream(new BufferedOutputStream(dest));
-				String[] components;
-				while(e.hasMoreElements())
-				{
-					currentfile = (ZipEntry) e.nextElement();
-					components = currentfile.getName().split("/");
-					
-					if (components[components.length-1].toLowerCase().endsWith(".class") && currentfile.getName().length() > 5)
-						class_listing.add(components[components.length-1].substring(0, components[components.length-1].length()-6));
-
-					if (needs_sig_removed && !(currentfile.getName().endsWith(".DSA") || currentfile.getName().endsWith(".SF")))
-					{
-						BufferedInputStream is = new BufferedInputStream(mcjar.getInputStream(currentfile));
-						zout.putNextEntry(currentfile);
-						
-			            while((count = is.read(data, 0, BUFFER)) != -1) {
-			               zout.write(data, 0, count);
-			            }
-			            is.close();
-					}
-				}
-				if (needs_sig_removed)
-					zout.close();
-				mcjar.close();
-				
-				if (needs_sig_removed)
-				{
-					minecraftJar.delete();
-					(new File(minecraftJar.getAbsolutePath()+".new")).renameTo(minecraftJar);
-					
-					printm("Removed MOJANG signatures."+NEW_LINE);
-				}
-				
-			} catch (ZipException e1) {
-				System.out.println(currentfile.getName());
-				e1.printStackTrace();
-                printe("Failed to extract file from zip:" + currentfile.getName() +NEW_LINE);
-				
-			} catch (IOException e1) {
-				e1.printStackTrace();
-                printe("Failed to open new jar for writing!"+NEW_LINE);
-				
-			}
-		}
 		
+		ZipFile mcjar;
+		
+		classListing = new ArrayList<String>();
+		ZipEntry currentfile = null;
 		try {
+			
+			// Setup the data buffer for copying stuff.
+			int count;
+			
+			byte data[] = new byte[1024 * 2];
+			
+			mcjar = new ZipFile(minecraftJar);
+			
+			// Copy grasscolor.png and foliagecolor.png
+			ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
+			ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
+			
+			if (grasscolor != null)
+			{
+				grassColourImage = ImageIO.read(mcjar.getInputStream(grasscolor));
+			}
+			if (foliagecolor != null)
+			{
+				foliageColourImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
+			}
+            
+			ZipEntry mojang1 = mcjar.getEntry("META-INF/MOJANG_C.DSA");
+			boolean needs_sig_removed = (mojang1 != null);
+			
+			Enumeration<? extends ZipEntry> e = mcjar.entries();
+			
+			FileOutputStream dest = new FileOutputStream(new File(minecraftJar.getAbsolutePath()+".new"));
+			ZipOutputStream zout = null;
+			if (needs_sig_removed)
+				zout = new ZipOutputStream(new BufferedOutputStream(dest));
+			String[] components;
+			while(e.hasMoreElements())
+			{
+				currentfile = (ZipEntry) e.nextElement();
+				components = currentfile.getName().split("/");
+				
+				if (components[components.length-1].toLowerCase().endsWith(".class") && currentfile.getName().length() > 5)
+					classListing.add(components[components.length-1].substring(0, components[components.length-1].length()-6));
+
+				if (needs_sig_removed && !(currentfile.getName().endsWith(".DSA") || currentfile.getName().endsWith(".SF")))
+				{
+					BufferedInputStream is = new BufferedInputStream(mcjar.getInputStream(currentfile));
+					zout.putNextEntry(currentfile);
+					
+		            while((count = is.read(data, 0, data.length)) != -1)
+		            {
+		               zout.write(data, 0, count);
+		            }
+		            is.close();
+				}
+			}
+			if (needs_sig_removed)
+				zout.close();
+			
+			mcjar.close();
+			
+			if (needs_sig_removed)
+			{
+				minecraftJar.delete();
+				(new File(minecraftJar.getAbsolutePath()+".new")).renameTo(minecraftJar);
+				
+				printm("Removed MOJANG signatures."+NEW_LINE);
+			}
+			
+		}
+		catch (ZipException e1)
+		{
+			System.out.println(currentfile.getName());
+			e1.printStackTrace();
+            printe("Failed to extract file from zip:" + currentfile.getName() +NEW_LINE);
+			
+		}
+		catch (IOException e1)
+		{
+			e1.printStackTrace();
+            printe("Failed to open new jar for writing!"+NEW_LINE);
+		}
+	
+		
+		try
+		{
 			ClasspathUtil.addJarToClasspath(minecraftJar);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			printe("I can't seem to find your minecraft.jar file!"+NEW_LINE);
 		}
 		
@@ -816,9 +811,9 @@ public class WorldProcessor implements Runnable
 		
 		class_signatures = new ArrayList<String>();
 		
-		for (int i = 0; i<class_listing.size();i++)
+		for (int i = 0; i<classListing.size();i++)
 		{
-			class_signatures.add(ReflectionUtil.generateClassSignature(class_listing.get(i)));
+			class_signatures.add(ReflectionUtil.generateClassSignature(classListing.get(i)));
 			
 			// Dump all the class signatures - helpful!
 			//System.out.println(class_listing.get(i));
@@ -829,18 +824,18 @@ public class WorldProcessor implements Runnable
 		int class_id = this.matchClassSignature(save_class_signature);
 		if (class_id != -1)
 		{
-			save_class = class_listing.get(class_id);
+			save_class = classListing.get(class_id);
 			printm("Save class is: "+save_class+NEW_LINE);
 		}
 		else
 		{
 			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
 			printe("Signature match for save class not found."+NEW_LINE);
-			printe("Class listing ("+ Integer.toString(class_listing.size()) + "entires)" + NEW_LINE);
+			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
 			
-			for (int i=0; i<class_listing.size(); i++)
+			for (int i=0; i<classListing.size(); i++)
 			{
-				printe("\t"+ class_listing.get(i) + ".class" + NEW_LINE);
+				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
 			}
 			return false;
 		}
@@ -848,7 +843,7 @@ public class WorldProcessor implements Runnable
 		class_id = this.matchClassSignature(biome_gen_class_signature);
 		if (class_id != -1)
 		{
-			biome_gen_class = class_listing.get(class_id);
+			biome_gen_class = classListing.get(class_id);
 			printm("Biome Gen class is: "+biome_gen_class+NEW_LINE);
 		}
 		else
@@ -860,10 +855,13 @@ public class WorldProcessor implements Runnable
 	
 		// Get the classes we need using reflection
 		
-		try {
+		try
+		{
 			minecraftSaveClass = Class.forName(save_class);
 			biomeGeneratorClass = Class.forName(biome_gen_class);
-		} catch (ClassNotFoundException e2) {
+		}
+		catch (ClassNotFoundException e2)
+		{
 			printe("Can't find Minecraft! Looked here:"+NEW_LINE);
 			printe(minecraftJar.getAbsolutePath()+NEW_LINE);
 			printe("Make certain minecraft.jar is in that location."+NEW_LINE);
@@ -876,26 +874,33 @@ public class WorldProcessor implements Runnable
         partypes[0] = File.class;
         partypes[1] = String.class;
         
-		try {
+		try
+		{
 			createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
-		} catch (SecurityException e1) {
+		}
+		catch (SecurityException e1)
+		{
 			printe("Could not bind MinecraftSave Constructor (security issue)"+NEW_LINE);
 			printe("I'm trying to delete the Mojang signatures for you."+NEW_LINE);
 			printe("Restart the program and try again."+NEW_LINE);
 			return false;
-		} catch (NoSuchMethodException e1) {
-			
+		}
+		catch (NoSuchMethodException e1)
+		{
 			// This could mean that you are operating on a server JAR. Try this:
-			try {
+			try
+			{
 				printm("Looks like this might be a server JAR. Keep trying..."+NEW_LINE);
 				partypes = new Class[4];
 		        partypes[0] = File.class;
 		        partypes[1] = String.class;
 		        partypes[2] = Long.TYPE;
-				partypes[3] = Class.forName(class_listing.get(this.matchClassSignature(SERVER_RAND_CLASS_REF)));
+				partypes[3] = Class.forName(classListing.get(this.matchClassSignature(SERVER_RAND_CLASS_REF)));
 				createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
 				isServerJar = true;
-			} catch (Throwable e) {
+			}
+			catch (Throwable e)
+			{
 				printe("Could not bind MinecraftSave Constructor for servers."+NEW_LINE);
 				printe("Minecraft version was incompatible"+NEW_LINE);
 				return false;
