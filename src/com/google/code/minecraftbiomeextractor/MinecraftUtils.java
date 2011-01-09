@@ -1,7 +1,6 @@
 package com.google.code.minecraftbiomeextractor;
 
 import java.io.File;
-
 import javax.swing.filechooser.FileSystemView;
 
 public class MinecraftUtils

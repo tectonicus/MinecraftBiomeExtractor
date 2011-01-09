@@ -19,8 +19,6 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import javax.swing.filechooser.FileSystemView;
-
 public class WorldProcessor implements Runnable
 {
 	
@@ -162,8 +160,8 @@ public class WorldProcessor implements Runnable
 		
 		if (outputDir == null)
 		{
-			printe("No output dir specified\n");
-			return;
+			outputDir = new File(worldFolder,"EXTRACTEDBIOMES");
+			printm("No output dir specified. Placing output in "+ outputDir.getAbsolutePath() + NEW_LINE);
 		}
 		
 		if (outputDir.exists() && flush)

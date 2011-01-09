@@ -46,7 +46,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		log.setCaretPosition(log.getDocument().getLength());
 	}
 	
-	public MinecraftBiomeExtractorGUI() 
+	public MinecraftBiomeExtractorGUI(File jarLocation) 
 	{
 		super(new BorderLayout());
 		
@@ -105,6 +105,8 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		
 		// Create a world processor and bind to minecraft
 		world_processor = new WorldProcessor(this,false,delete_existing_files.isSelected());
+		if (jarLocation != null)
+			world_processor.setJarLocation(jarLocation);
 		bound = world_processor.bindToMinecraft();
 		
 		if (bound)
@@ -202,21 +204,21 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 	* event dispatch thread.
 	 * @throws IOException 
 	*/
-	private static void createAndShowGUI() 
+	private static void createAndShowGUI(File jarLocation) 
 	{
 		//Create and set up the window.
 		JFrame frame = new JFrame("Minecraft Biome Extractor");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	
 		//Add content to the window.
-		frame.add(new MinecraftBiomeExtractorGUI());
+		frame.add(new MinecraftBiomeExtractorGUI(jarLocation));
 	
 		//Display the window.
 		frame.pack();
 		frame.setVisible(true);
 	}
 
-	public static void launchGUI()
+	public static void launchGUI(final File jarLocation)
 	{
 		SwingUtilities.invokeLater( new Runnable()
 		{
@@ -224,7 +226,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 			{
 				//Turn off metal's use of bold fonts
 				UIManager.put("swing.boldMetal", Boolean.FALSE); 
-				createAndShowGUI();
+				createAndShowGUI(jarLocation);
 			}
 		} );
 	}

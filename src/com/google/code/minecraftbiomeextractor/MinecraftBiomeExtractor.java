@@ -70,7 +70,10 @@ public class MinecraftBiomeExtractor
 		}
 		else if (!noGui)
 		{
-			MinecraftBiomeExtractorGUI.launchGUI();
+			if (manualJarLocation)
+				MinecraftBiomeExtractorGUI.launchGUI(jarLocation);
+			else
+				MinecraftBiomeExtractorGUI.launchGUI(null);
 		}
 		else
 		{
