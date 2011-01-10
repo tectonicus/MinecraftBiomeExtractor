@@ -21,6 +21,11 @@ import java.util.zip.ZipOutputStream;
 
 public class WorldProcessor implements Runnable
 {
+	public enum ColourType
+	{
+		GrassColour,
+		FoliageColour
+	}
 	
 	private static final String NEW_LINE = "\n";
 	
@@ -582,11 +587,14 @@ public class WorldProcessor implements Runnable
 				return 0;
 			}
 	  }
-	  
-	  public byte[] getCoordsAtBlock(final int x, final int z) // Returns the location of the biome color in the 256x256 biome PNG (an int)
-	  {
-		  	argList[0] = x;
-			argList[1] = z;
+
+	public byte[] getCoordsAtBlock(final int x, final int z) // Returns the location of the biome color in the 256x256 biome PNG (an int)
+	{
+		if (biomeGenerator == null)
+			throw new NullPointerException("BiomeGenerator is null!");
+		
+		argList[0] = x;
+		argList[1] = z;
 			byte[] coords = new byte[2];
 			coords[0] = 0;
 			coords[1] = 0;
@@ -618,20 +626,20 @@ public class WorldProcessor implements Runnable
 	  }
 	  
 	  // Returns the biome color at a given block, packed in an int as RGB
-	  public int getRGBAtBlock(final int x, final int z, final int type)
+	  public int getRGBAtBlock(final int x, final int z, final ColourType type)
 	  {
-		  	byte[] coords = getCoordsAtBlock(x,z);
-		  	//System.out.print("("+Byte.toString(coords[0])+","+Byte.toString(coords[1])+")");
-			if (type == 0)
+		  	final byte[] coords = getCoordsAtBlock(x,z);
+		  	
+			if (type == ColourType.GrassColour)
 				return grassColourImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
-			else if (type == 1)
+			else if (type == ColourType.FoliageColour)
 				return foliageColourImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
 			else
 				return 0;
 	  }
 	  
 	// Returns the biome color at a given block
-	public Color getColorAtBlock(final int x, final int z, final int type)
+	public Color getColorAtBlock(final int x, final int z, final ColourType type)
 	{
 		return new Color(getRGBAtBlock(x, z, type));
 	}

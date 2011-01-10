@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="BiomeExtractor" default="CreateJar" basedir=".">
+	
+	<property name="ProjectName" 		value="BiomeExtractor" />
+	
+	<property name="Version"			value="1.0" />
+	
+	<property name="Source"				location="src" />
+	<property name="Dist"				location="Dist" />
+	<property name="FactoryFloor"		location="${Dist}/FactoryFloor"/>
+	<property name="Binary"				location="${FactoryFloor}/Binary"/>
+	
+	<target name="CleanBuild">
+		<delete failonerror="false" dir="${FactoryFloor}" />
+	</target>
+	
+	<target name="CreateJar" depends="CleanBuild, Compile, ExportBuildInfo" >
+		
+		<mkdir dir="${FactoryFloor}"/>
+		
+		<jar destfile="${FactoryFloor}/BiomeExtractor.jar"
+				basedir="${Binary}"
+		/>
+		
+		<copy file="${FactoryFloor}/BiomeExtractor.jar" todir="${Dist}" />
+		
+	</target>
+	
+	<target name="Compile">
+		<mkdir dir="${FactoryFloor}"/>
+		<mkdir dir="${Binary}"/>
+		
+		<javac srcdir="${Source}" destdir="${Binary}" classpath="" debug="true" debuglevel="lines,source" verbose="false" >
+		</javac>
+	</target>
+	
+	<target name="ExportBuildInfo" >
+		
+		<exec dir="." executable="svnversion" output="build.number" searchpath="true" failifexecutionfails="false">
+			<arg value="-n" />
+		</exec>
+		<loadfile property="BuildNumber" srcFile="build.number"/>
+		
+		<delete file="{Binary}/build.number" />
+		
+		<tstamp/>
+		
+		<propertyfile file="${Binary}/biomeextractor.buildInfo" comment="Biome extractor build info">
+			<entry key="buildNumber" type="string" value="${BuildNumber}" />
+			<entry key="buildDate" type="string" value="${TODAY}" />
+			<entry key="buildTime" type="string" value="${TSTAMP}" />
+			<entry key="version" type="string" value="${Version}" />
+		</propertyfile>
+		
+		<echo message="Version: ${Version}" />
+		<echo message="Build number: ${BuildNumber}" />
+		<echo message="Build date: ${TODAY}" />
+		<echo message="Build time: ${TSTAMP}" />
+		
+	</target>
+	
+</project>
