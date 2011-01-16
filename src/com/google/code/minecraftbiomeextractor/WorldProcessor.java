@@ -55,6 +55,7 @@ public class WorldProcessor implements Runnable
     // Storage for the grasscolor and foliagecolor pngs
 	private BufferedImage grassColourImage = null;
 	private BufferedImage foliageColourImage = null;
+	private boolean useDefaultBiomeImages = true;
 	
 	// World Variables
 	private File worldFolder = null;
@@ -83,6 +84,7 @@ public class WorldProcessor implements Runnable
 		
         // Setup a parameter array we'll use to invoke minecraft's biome generator
 		setupBiomeGenArgs();
+		setupDefaultBiomeImages();
 	}
 	
 	public WorldProcessor(MinecraftBiomeExtractorGUI gui, final boolean errorsOnly, final boolean flush)
@@ -97,6 +99,21 @@ public class WorldProcessor implements Runnable
 		
         // Setup a parameter array we'll use to invoke minecraft's biome generator
 		setupBiomeGenArgs();
+		setupDefaultBiomeImages();
+		
+	}
+	
+	private void setupDefaultBiomeImages()
+	{
+		try
+		{
+			grassColourImage = ImageIO.read(WorldProcessor.class.getResource("/grasscolor_mbe_fallback.png"));
+			foliageColourImage = ImageIO.read(WorldProcessor.class.getResource("/foliagecolor_mbe_fallback.png"));
+		}
+		catch (IOException e)
+		{
+			printm("Warning, could not load default biome color images." + NEW_LINE);
+		}
 	}
 	
 	private void setupBiomeGenArgs()
@@ -176,7 +193,8 @@ public class WorldProcessor implements Runnable
 		}
 	
 		printm("Opening " + worldFolder.getName() + "..." + NEW_LINE);
-		this.setupDataFolder(worldFolder.getAbsolutePath());
+		
+		this.setupDataFolder(outputDir);
 
 		printm("Locating Minecraft save..."+NEW_LINE);
 		if (!this.loadWorld())
@@ -446,9 +464,8 @@ public class WorldProcessor implements Runnable
     
     // If no EXTRACTEDBIOMES folder exists, make one.
     // Copy in grasscolor.png and foliagecolor.png
-    private void setupDataFolder(final String worldpath)
+    private void setupDataFolder(final File biomesFolder)
     {
-    	File biomesFolder = new File(worldpath,"EXTRACTEDBIOMES");
 		if (!(biomesFolder.exists() && biomesFolder.isDirectory()))
 		{	
 			if (!biomesFolder.mkdir())
@@ -661,6 +678,7 @@ public class WorldProcessor implements Runnable
 			{
 				return false;
 			}
+		useDefaultBiomeImages = false;
 		return true;
 	}
 	
@@ -717,15 +735,17 @@ public class WorldProcessor implements Runnable
 			ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
 			ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
 			
-			if (grasscolor != null)
+			// Only try to grab the biome color images from minecraft if they exist in the JAR
+			// and they are not already loaded (from the setBiomeImages method, for example).
+			if (grasscolor != null && useDefaultBiomeImages)
 			{
 				grassColourImage = ImageIO.read(mcjar.getInputStream(grasscolor));
 			}
-			if (foliagecolor != null)
+			if (foliagecolor != null && useDefaultBiomeImages)
 			{
 				foliageColourImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
 			}
-            
+			
 			ZipEntry mojang1 = mcjar.getEntry("META-INF/MOJANG_C.DSA");
 			boolean needs_sig_removed = (mojang1 != null);
 			
