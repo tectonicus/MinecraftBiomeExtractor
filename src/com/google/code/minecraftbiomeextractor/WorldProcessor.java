@@ -14,9 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -749,10 +747,6 @@ public class WorldProcessor implements Runnable
 			{
 				foliageColourImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
 			}
-			
-			ZipEntry mojang1 = mcjar.getEntry("META-INF/MOJANG_C.DSA");
-			final boolean needs_sig_removed = (mojang1 != null);
-			
 			
 			// Scan the jar file and gather a class listing
 			
