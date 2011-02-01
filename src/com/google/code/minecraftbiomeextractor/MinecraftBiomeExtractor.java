@@ -98,7 +98,7 @@ public class MinecraftBiomeExtractor
 					worldProcessor.setOutputDir(outputDir);
 					worldProcessor.run();
 				}
-			}				
+			}
 			else
 			{
 				System.out.println("Error: world folder not found.");

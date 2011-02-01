@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -720,23 +721,24 @@ public class WorldProcessor implements Runnable
 			return false;
 		}
 		
-		ZipFile mcjar;
-		
 		classListing = new ArrayList<String>();
-		ZipEntry currentfile = null;
-		try {
+		try
+		{
+			// Take a copy of the jar to work on and strip out the signature while we're at it
+			File newMinecraftJar = new File(minecraftJar.getParentFile(), minecraftJar.getName()+".new");
+			stripMinecraftJar(minecraftJar, newMinecraftJar);
+			minecraftJar = newMinecraftJar;
 			
-			// Setup the data buffer for copying stuff.
-			int count;
+			// Now we've got a copy we can go to work on it
 			
-			byte data[] = new byte[1024 * 2];
-			
-			mcjar = new ZipFile(minecraftJar);
+			ZipFile mcjar = new ZipFile(minecraftJar);
 			
 			// Copy grasscolor.png and foliagecolor.png
 			ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
 			ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
 			
+			// TODO: This doesn't close the input streams properly
+
 			// Only try to grab the biome color images from minecraft if they exist in the JAR
 			// and they are not already loaded (from the setBiomeImages method, for example).
 			if (grasscolor != null && useDefaultBiomeImages)
@@ -749,60 +751,37 @@ public class WorldProcessor implements Runnable
 			}
 			
 			ZipEntry mojang1 = mcjar.getEntry("META-INF/MOJANG_C.DSA");
-			boolean needs_sig_removed = (mojang1 != null);
+			final boolean needs_sig_removed = (mojang1 != null);
+			
+			
+			// Scan the jar file and gather a class listing
 			
 			Enumeration<? extends ZipEntry> e = mcjar.entries();
-			
-			FileOutputStream dest = new FileOutputStream(new File(minecraftJar.getAbsolutePath()+".new"));
-			ZipOutputStream zout = null;
-			if (needs_sig_removed)
-				zout = new ZipOutputStream(new BufferedOutputStream(dest));
-			String[] components;
-			while(e.hasMoreElements())
+			while (e.hasMoreElements())
 			{
-				currentfile = (ZipEntry) e.nextElement();
-				components = currentfile.getName().split("/");
+				ZipEntry currentFile = e.nextElement();
+				String[] components = currentFile.getName().split("/");
+				String fileName = components[components.length-1];
 				
-				if (components[components.length-1].toLowerCase().endsWith(".class") && currentfile.getName().length() > 5)
-					classListing.add(components[components.length-1].substring(0, components[components.length-1].length()-6));
-
-				if (needs_sig_removed && !(currentfile.getName().endsWith(".DSA") || currentfile.getName().endsWith(".SF")))
+				if (fileName.toLowerCase().endsWith(".class") && currentFile.getName().length() > 5)
 				{
-					BufferedInputStream is = new BufferedInputStream(mcjar.getInputStream(currentfile));
-					zout.putNextEntry(currentfile);
-					
-		            while((count = is.read(data, 0, data.length)) != -1)
-		            {
-		               zout.write(data, 0, count);
-		            }
-		            is.close();
+					String className = fileName.substring(0, fileName.length()-6);
+					classListing.add(className);
 				}
 			}
-			if (needs_sig_removed)
-				zout.close();
 			
 			mcjar.close();
-			
-			if (needs_sig_removed)
-			{
-				minecraftJar.delete();
-				(new File(minecraftJar.getAbsolutePath()+".new")).renameTo(minecraftJar);
-				
-				printm("Removed MOJANG signatures."+NEW_LINE);
-			}
-			
-		}
-		catch (ZipException e1)
-		{
-			System.out.println(currentfile.getName());
-			e1.printStackTrace();
-            printe("Failed to extract file from zip:" + currentfile.getName() +NEW_LINE);
 			
 		}
 		catch (IOException e1)
 		{
 			e1.printStackTrace();
             printe("Failed to open new jar for writing!"+NEW_LINE);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			printe("Exception while trying to open jar file"+NEW_LINE);
 		}
 	
 		
@@ -1008,6 +987,62 @@ public class WorldProcessor implements Runnable
 		
 		bound = true;
 		return true;
+	}
+	
+	private static void stripMinecraftJar(File srcJar, File destJar) throws Exception
+	{
+		// Copy the jar and strip out the signature while we're at it
+		
+		FileOutputStream dest = null;
+		ZipOutputStream zout = null;
+		
+		try
+		{
+			byte data[] = new byte[1024 * 2];
+			
+			dest = new FileOutputStream(destJar);
+			zout = new ZipOutputStream(new BufferedOutputStream(dest));
+			
+			ZipFile mcjar = new ZipFile(srcJar);
+			Enumeration<? extends ZipEntry> e = mcjar.entries();
+			while(e.hasMoreElements())
+			{
+				ZipEntry currentfile = (ZipEntry)e.nextElement();
+	
+				// Only copy files which don't end in .dsa or .sf
+				if ( !(currentfile.getName().endsWith(".DSA") || currentfile.getName().endsWith(".SF")) )
+				{
+					BufferedInputStream is = new BufferedInputStream(mcjar.getInputStream(currentfile));
+					zout.putNextEntry(currentfile);
+					
+					int count = 0;
+		            while((count = is.read(data, 0, data.length)) != -1)
+		            {
+		               zout.write(data, 0, count);
+		            }
+		            is.close();
+				}
+				else
+				{
+					System.out.println("Skipping "+currentfile.getName());
+				}
+			}
+		}
+		finally
+		{
+			try
+			{
+				if (zout != null)
+					zout.close();
+			}
+			catch (Exception e) {}
+			try
+			{
+				if (dest != null)
+					dest.close();
+			}
+			catch (Exception e) {}
+		}
 	}
 	
 	// END CLASS DEF

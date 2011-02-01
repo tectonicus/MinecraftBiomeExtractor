@@ -18,9 +18,13 @@
 	<target name="CreateJar" depends="CleanBuild, Compile, ExportBuildInfo" >
 		
 		<mkdir dir="${FactoryFloor}"/>
+		<mkdir dir="${FactoryFloor}/Temp"/>
+		
+		<copydir dest="${FactoryFloor}/Temp" src="${Binary}"/>
+		<copydir dest="${FactoryFloor}/Temp" src="${Source}"/>
 		
 		<jar destfile="${FactoryFloor}/BiomeExtractor.jar"
-				basedir="${Binary}"
+				basedir="${FactoryFloor}/Temp"
 		/>
 		
 		<copy file="${FactoryFloor}/BiomeExtractor.jar" todir="${Dist}" />
