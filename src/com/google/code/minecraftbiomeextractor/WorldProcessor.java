@@ -8,6 +8,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -1118,8 +1119,11 @@ public class WorldProcessor implements Runnable
 				// Only copy files which don't end in .dsa or .sf
 				if ( !(currentfile.getName().endsWith(".DSA") || currentfile.getName().endsWith(".SF")) )
 				{
-					BufferedInputStream is = new BufferedInputStream(mcjar.getInputStream(currentfile));
-					zout.putNextEntry(currentfile);
+					InputStream in = mcjar.getInputStream(currentfile);
+					BufferedInputStream is = new BufferedInputStream(in);
+					
+					ZipEntry destEntry = new ZipEntry (currentfile.getName());
+					zout.putNextEntry(destEntry);
 					
 					int count = 0;
 		            while((count = is.read(data, 0, data.length)) != -1)

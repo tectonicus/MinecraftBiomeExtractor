@@ -1,0 +1,95 @@
+ + + + + + + + + + + + + + + + + + + + + + + +
+                  Tectonicus
+   Version: 1.0
+   Build 2327MP
+   Constructed on December 19 2010 at 1605
+ + + + + + + + + + + + + + + + + + + + + + + +
+Started on Mon Dec 20 19:26:23 GMT 2010
+System:
+	OS Name: Windows 7
+	OS Architecture: amd64
+	OS Version: 6.1
+	Java vendor: Sun Microsystems Inc.
+	Java version: 1.6.0_22
+	Awt toolkit: sun.awt.windows.WToolkit
+	Headless?: null
+Settings:
+	interactive:false
+	worldDir:C:\Users\john_campbell\Pickaxe\TectonicusMap\Temp\world
+	outputDir:C:\Users\john_campbell\Pickaxe\TectonicusMap\Working
+	useCache:true
+	cacheDir:C:\Users\john_campbell\Pickaxe\TectonicusMap\Working\cache
+	minecraftJar:C:\Users\john_campbell\AppData\Roaming\.minecraft\bin\minecraft.jar
+	texturePack:none
+	colourDepth:24
+	alphaBits:8
+	numSamples:0
+	tileSize:512
+	lighting:Day
+	cameraAngle:45
+	closestZoomSize:12
+	numZoomLevels:8
+	imageFormat:png
+	eraseOutputDir:false
+	extractLwjglNatives:true
+	isVerbose:false
+	forceLoadAwt:false
+	force32BitNatives:false
+	force64BitNatives:false
+Cache directory found and is valid. Using cache at C:\Users\john_campbell\Pickaxe\TectonicusMap\Working\cache
+Discovered 441 chunks
+Starting tile renderer
+Base render is at zoom 12 with 512x512 tiles
+Finding visible tiles...
+22%
+45%
+68%
+90%
+100%
+found 956 total tiles to output
+Finding changed tiles since last render...
+20%
+41%
+62%
+83%
+100%
+Skipping 956 unchanged tiles
+0 tiles to render
+Base tile render complete
+Downsampling to create zoom level 7
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Downsampling to create zoom level 6
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Downsampling to create zoom level 5
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Downsampling to create zoom level 4
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Downsampling to create zoom level 3
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Downsampling to create zoom level 2
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Downsampling to create zoom level 1
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Downsampling to create zoom level 0
+	Scanning for next zoom tiles...
+	Downsampling 0 tiles into 0 tiles
+100%
+Writing signs...
+Writing example html...
+Writing changed file list...
+Tile render took 3 seconds
+Finished!
