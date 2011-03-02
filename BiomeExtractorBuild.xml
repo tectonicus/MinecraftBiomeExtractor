@@ -8,6 +8,7 @@
 	
 	<property name="Source"				location="src" />
 	<property name="Dist"				location="Dist" />
+	<property name="Resources"			location="resources" />
 	<property name="FactoryFloor"		location="${Dist}/FactoryFloor"/>
 	<property name="Binary"				location="${FactoryFloor}/Binary"/>
 	
@@ -22,6 +23,7 @@
 		
 		<copydir dest="${FactoryFloor}/Temp" src="${Binary}"/>
 		<copydir dest="${FactoryFloor}/Temp" src="${Source}"/>
+		<copydir dest="${FactoryFloor}/Temp" src="${Resources}"/>
 		
 		<jar destfile="${FactoryFloor}/BiomeExtractor.jar"
 				basedir="${FactoryFloor}/Temp"

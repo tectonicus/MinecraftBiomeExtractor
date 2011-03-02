@@ -1046,12 +1046,17 @@ public class WorldProcessor implements Runnable
 		// Setup the save class loaded field
 		save_notloaded = ReflectionUtil.getFieldWithType(save_class, save_notloaded_type, save_notloaded_count);
 
-		try {
+		try
+		{
 			loadedField = minecraftSaveClass.getField(save_notloaded);
-		} catch (SecurityException e2) {
+		}
+		catch (SecurityException e2)
+		{
 			printe("Couldn't check if save loaded."+NEW_LINE);
 			printm("Trying anyway..."+NEW_LINE);
-		} catch (NoSuchFieldException e2) {
+		}
+		catch (NoSuchFieldException e2)
+		{
 			printe("Couldn't check if save loaded."+NEW_LINE);
 			printm("Trying anyway..."+NEW_LINE);
 		}
