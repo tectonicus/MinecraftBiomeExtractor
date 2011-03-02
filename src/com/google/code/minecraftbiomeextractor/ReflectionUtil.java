@@ -24,7 +24,12 @@ public class ReflectionUtil
 				Class<?> pvec[] = ct.getParameterTypes();
 				for (int j = 0; j < pvec.length; j++)
 				{
-					signature += "carg:" + pvec[j].toString() + " ";
+					if (pvec[j].toString().startsWith("class"))
+						signature += "carg:class" + " ";
+					else if (pvec[j].toString().startsWith("interface"))
+						signature += "carg:interface" + " ";
+					else
+						signature += "carg:" + pvec[j].toString() + " ";
 				}
 				signature += "+";
 			}
@@ -38,11 +43,15 @@ public class ReflectionUtil
 				{
 					if (pvec[j].toString().startsWith("class"))
 						signature += "arg:class" + " ";
+					else if (pvec[j].toString().startsWith("interface"))
+						signature += "arg:interface" + " ";
 					else
 						signature += "arg:" + pvec[j].toString() + " ";
 				}
 				if (m.getReturnType().toString().startsWith("class"))
 					signature += "ret:class" + "+";
+				else if (m.getReturnType().toString().startsWith("interface"))
+					signature += "ret:interface" + "+";
 				else
 					signature += "ret:" + m.getReturnType().toString() + "+";
 			}
@@ -53,6 +62,8 @@ public class ReflectionUtil
 				Field field = fieldList[i];
 				if (field.getType().toString().startsWith("class"))
 					signature += "fld:class" + "+";
+				else if (field.getType().toString().startsWith("interface"))
+					signature += "fld:interface" + "+";
 				else
 					signature += "fld:" + field.getType().toString() + "+";
 			}

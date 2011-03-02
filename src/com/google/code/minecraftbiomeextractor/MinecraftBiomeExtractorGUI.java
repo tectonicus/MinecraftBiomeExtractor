@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -31,7 +32,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 	private JCheckBox delete_existing_files;
 	private JFileChooser fc;
 	
-	private File minecraftFolderPath;
+	private List<File> worldDirs;
 	
 	private File world_folder = null;
 	private boolean world_selected = false;
@@ -50,8 +51,6 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 	{
 		super(new BorderLayout());
 		
-		minecraftFolderPath = MinecraftUtils.findMinecraftDir();
-		
 		//Create the log first, because the action listeners
 		//need to refer to it.
 		log = new JTextArea(20,50);
@@ -64,9 +63,16 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	
 		// Create the Combo Box
-		String[] defaultStrings = { "Choose a world to update","World1", "World2", "World3", "World4", "World5", "Open World Folder..." };
-		File checkworld;
+		worldDirs = MinecraftUtils.getWorldDirs();
+		String[] defaultStrings = new String[worldDirs.size()+2];
+		defaultStrings[0]="Choose a world to update";
+		defaultStrings[defaultStrings.length-1]="Open World Folder...";
 		
+		for (int i=1; i<worldDirs.size()+1; i++)
+		{
+			defaultStrings[i] = worldDirs.get(i-1).getName();
+		}
+
 		ActionHandler actionHandler = new ActionHandler();
 		
 		openMenu = new JComboBox(defaultStrings);
@@ -77,13 +83,6 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		
 		go = new JButton("Go");
 		go.addActionListener(actionHandler);
-		
-		for(int i = 5; i > 0; i--)
-		{
-			checkworld = new File(new File(minecraftFolderPath,"saves"),"World"+Integer.toString(i));
-			if (!checkworld.exists())
-				openMenu.removeItemAt(i);
-		}
 		
 		// For layout purposes, put the buttons in a separate panel
 		JPanel buttonPanel = new JPanel(); // use default FlowLayout
@@ -98,7 +97,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		// Create our escape key listener
 		log.addKeyListener( new KeyHandler() );
 		
-		log.append("Minecraft Biome Extractor (v0.7.1 beta)"+newline);
+		log.append("Minecraft Biome Extractor (v0.8.0 beta)"+newline);
 		log.append("By Donkey Kong"+newline+newline);
 		
 		log.repaint();
@@ -191,7 +190,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 				}
 				else if (openMenu.getSelectedIndex() != 0)
 				{
-					world_folder =  new File(new File(minecraftFolderPath,"saves"),(String)openMenu.getSelectedItem());
+					world_folder =  worldDirs.get(openMenu.getSelectedIndex()-1);
 					world_selected = true;
 				}
 			}

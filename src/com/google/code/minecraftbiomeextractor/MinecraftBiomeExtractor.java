@@ -60,7 +60,7 @@ public class MinecraftBiomeExtractor
 		
 		if (outputDir == null)
 		{
-			outputDir = new File(worldFolder, "EXTRACTEDBIOMES");
+			outputDir = new File(worldFolder, "biomes");
 		}
 		
 		if (showHelp)

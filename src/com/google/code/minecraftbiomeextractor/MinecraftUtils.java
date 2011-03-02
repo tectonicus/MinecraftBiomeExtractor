@@ -1,6 +1,9 @@
 package com.google.code.minecraftbiomeextractor;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.filechooser.FileSystemView;
 
 public class MinecraftUtils
@@ -29,6 +32,23 @@ public class MinecraftUtils
 		}
 		
 		return minecraftFolderPath;
+	}
+	
+	public static List<File> getWorldDirs()
+	{
+		List<File> worldDirs = new ArrayList<File>();
+		File savedir = new File(findMinecraftDir(),"saves");
+		File[] potentialWorlds = savedir.listFiles();
+		
+		for(int i = 0; i< potentialWorlds.length; i++)
+		{
+			if (potentialWorlds[i].isDirectory() && (new File(potentialWorlds[i],"level.dat")).exists() && (new File(potentialWorlds[i],"region")).isDirectory())
+			{
+				// If the potential world is a directory, it contains a level.dat and a region folder
+				worldDirs.add(potentialWorlds[i]);
+			}
+		}
+		return worldDirs;
 	}
 	
 	public static File findBinaryDir(File minecraftDir)

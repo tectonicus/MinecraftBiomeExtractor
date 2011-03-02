@@ -30,9 +30,19 @@ public class WorldProcessor implements Runnable
 	
 	private static final boolean printClassRefStrings = false;
 	
-	private static final String SAVE_CLASS_REF = "carg:class java.lang.String carg:class qx carg:long +carg:class java.io.File carg:class java.lang.String +carg:class java.io.File carg:class java.lang.String carg:long carg:class qx +carg:class java.io.File carg:class java.lang.String carg:long +carg:class dn carg:class qx +ret:void+arg:int arg:int arg:int ret:boolean+ret:void+ret:void+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int ret:class+arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:float+arg:class ret:void+ret:void+arg:float ret:class+arg:class ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class arg:class ret:void+ret:void+arg:class ret:void+arg:class arg:class ret:boolean+arg:interface lc ret:void+arg:int arg:int ret:class+arg:float ret:float+arg:class ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:interface java.util.List ret:void+arg:class ret:int+arg:int arg:int arg:int arg:class ret:void+arg:class arg:class ret:interface java.util.List+ret:interface bm+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+ret:class+arg:boolean arg:boolean ret:void+arg:class ret:void+ret:class+arg:class ret:interface bm+arg:int arg:int ret:int+arg:class ret:void+arg:boolean arg:interface ru ret:void+arg:int ret:boolean+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:boolean ret:int+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int ret:int+arg:class arg:class ret:class+arg:class arg:class arg:boolean ret:class+arg:class arg:class arg:float arg:float ret:void+arg:double arg:double arg:double arg:class arg:float arg:float ret:void+arg:class arg:int arg:int arg:int ret:void+arg:class arg:double arg:double arg:double arg:double arg:double arg:double ret:void+arg:class ret:boolean+arg:interface lc ret:void+arg:class arg:class ret:interface java.util.List+arg:float ret:int+arg:class arg:float ret:class+arg:class arg:boolean ret:void+arg:class ret:boolean+arg:class arg:class arg:class ret:boolean+arg:class arg:class ret:boolean+arg:class arg:double arg:double arg:double arg:float ret:class+arg:class arg:double arg:double arg:double arg:float arg:boolean ret:class+arg:class arg:class ret:float+arg:class ret:class+arg:int arg:int arg:int arg:class ret:void+arg:interface ru ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int arg:boolean ret:void+arg:class arg:class ret:class+arg:boolean ret:boolean+arg:class arg:class ret:interface java.util.List+arg:interface java.util.List ret:void+arg:int arg:int arg:int arg:int arg:boolean ret:boolean+arg:class arg:class arg:float ret:class+arg:class arg:int arg:int arg:int arg:float ret:class+arg:class arg:double ret:class+arg:double arg:double arg:double arg:double ret:class+arg:int arg:int arg:int arg:int arg:int arg:int arg:class ret:void+arg:long ret:void+arg:class arg:int arg:int arg:int ret:boolean+arg:class arg:byte ret:void+arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:int+ret:interface java.util.List+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:void+ret:void+ret:boolean+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:int+arg:int arg:int arg:int ret:int+ret:void+arg:class ret:void+arg:float ret:float+ret:void+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+ret:void+ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:class+arg:class ret:void+ret:boolean+arg:int arg:int ret:int+ret:class+arg:class ret:void+arg:int arg:int arg:int ret:class+arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:void+fld:boolean+fld:interface java.util.List+fld:interface java.util.List+fld:interface java.util.List+fld:class+fld:interface java.util.Set+fld:interface java.util.List+fld:interface java.util.List+fld:long+fld:long+fld:int+fld:int+fld:int+fld:boolean+fld:long+fld:int+fld:int+fld:class+fld:int+fld:int+fld:int+fld:boolean+fld:class+fld:interface java.util.List+fld:interface bm+fld:class+fld:class+fld:long+fld:class+fld:long+fld:class+fld:boolean+fld:class+fld:int+fld:boolean+fld:boolean+fld:int+fld:interface java.util.Set+fld:int+fld:interface java.util.List+fld:boolean+";
-	private static final String BIOME_GEN_CLASS_REF = "+carg:class dn +arg:int arg:int ret:double+arg:int arg:int ret:class+arg:class ret:class+arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+";
-	private static final String SERVER_RAND_CLASS_REF = "+ret:interface cg+ret:void+ret:void+arg:class ret:void+arg:int arg:int ret:boolean+arg:long arg:float ret:float+arg:int ret:class+arg:class ret:interface bd+fld:class+fld:class+fld:boolean+fld:boolean+fld:boolean+fld:class+fld:int+fld:class+";
+	// Client and Common Signatures
+	// Class names as of 1.3_01
+	/*ec*/private static final String SAVE_HANDLER_CLASS_REF = "carg:class carg:class carg:boolean +ret:class+ret:void+arg:class ret:interface+ret:class+arg:class arg:interface ret:void+arg:class ret:void+ret:void+fld:class+fld:class+fld:class+fld:long+";
+	/*rw*/private static final String ABSTRACT_SAVE_HANDLER_REF = "ret:class+ret:void+arg:class ret:interface+arg:class arg:interface ret:void+arg:class ret:void+";
+	/*dt*/private static final String SAVE_CLASS_REF = "carg:class carg:class +carg:interface carg:class carg:long +carg:interface carg:class carg:long carg:class +carg:interface carg:class carg:class carg:long +arg:int arg:int arg:int ret:boolean+ret:void+ret:long+arg:int arg:int arg:int ret:boolean+ret:interface+arg:int arg:int ret:class+arg:float ret:class+arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:float+arg:class ret:void+arg:class ret:boolean+arg:int arg:int arg:int arg:class ret:void+arg:class arg:int arg:int arg:int arg:int ret:void+ret:interface+arg:class ret:void+arg:class ret:boolean+arg:int arg:int ret:class+arg:interface ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:float+arg:interface ret:void+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:class ret:int+arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:class ret:interface+arg:int arg:int arg:int ret:class+arg:class arg:class ret:boolean+arg:int arg:int arg:int ret:boolean+ret:long+ret:class+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:boolean+ret:boolean+arg:class arg:double arg:double arg:double arg:double arg:double arg:double ret:void+arg:int arg:int ret:int+arg:class ret:void+arg:boolean arg:interface ret:void+arg:int ret:boolean+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:boolean ret:int+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int ret:int+arg:class arg:class ret:class+arg:class arg:class arg:boolean ret:class+arg:class arg:class arg:float arg:float ret:void+arg:double arg:double arg:double arg:class arg:float arg:float ret:void+arg:class arg:int arg:int arg:int ret:void+ret:class+arg:class ret:boolean+arg:interface ret:void+arg:class arg:class ret:interface+arg:float ret:int+arg:class arg:float ret:class+arg:class arg:boolean ret:void+arg:class ret:boolean+arg:class arg:class arg:class ret:boolean+arg:class arg:class ret:boolean+arg:class arg:double arg:double arg:double arg:float ret:class+arg:class arg:double arg:double arg:double arg:float arg:boolean ret:class+arg:class arg:class ret:float+arg:class ret:class+arg:int arg:int arg:int arg:class ret:void+arg:interface ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int arg:boolean ret:void+arg:boolean arg:boolean ret:void+arg:boolean ret:boolean+arg:class arg:class ret:interface+arg:interface ret:void+arg:int arg:int arg:int arg:int arg:boolean ret:boolean+arg:class arg:class arg:float ret:class+arg:class arg:int arg:int arg:int arg:float ret:class+arg:class arg:double ret:class+arg:double arg:double arg:double arg:double ret:class+arg:int arg:int arg:int arg:int arg:int arg:int arg:class ret:void+arg:long ret:void+arg:class ret:void+arg:class arg:int arg:int arg:int ret:boolean+arg:class arg:byte ret:void+arg:int arg:int arg:int ret:void+ret:void+ret:void+ret:interface+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:void+ret:boolean+arg:int arg:int arg:int arg:int ret:void+ret:class+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+ret:void+ret:class+arg:class ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:float+arg:int arg:int arg:int ret:int+ret:boolean+arg:int arg:int ret:int+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int arg:int ret:boolean+ret:void+ret:class+arg:int arg:int arg:int ret:void+ret:void+arg:float ret:class+arg:int arg:int arg:int arg:int arg:int ret:void+ret:void+arg:class ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:int+ret:void+arg:class ret:void+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int ret:int+ret:void+arg:int arg:int arg:int ret:class+fld:boolean+fld:interface+fld:interface+fld:interface+fld:class+fld:interface+fld:interface+fld:interface+fld:long+fld:int+fld:int+fld:int+fld:boolean+fld:long+fld:int+fld:int+fld:class+fld:boolean+fld:class+fld:interface+fld:interface+fld:interface+fld:class+fld:boolean+fld:boolean+fld:class+fld:int+fld:boolean+fld:boolean+fld:int+fld:interface+fld:int+fld:interface+fld:boolean+";
+	/*su*/private static final String BIOME_GEN_CLASS_REF = "+carg:class +arg:int arg:int ret:double+arg:int arg:int ret:class+arg:class ret:class+arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+";
+	
+	// Server-Specific Signatures
+	/*cw*/ // Server save handler - client works fine
+	/*mi*/ // Server abstract save handler - client works fine
+	/*nc*/ // Biome Gen - client works fine
+	/*cp*/ // Save Class - client works fine
+	/*mn*/private static final String SERVER_RAND_CLASS_REF = "+ret:interface+ret:void+ret:void+arg:class ret:void+arg:int arg:int ret:boolean+arg:long arg:float ret:float+arg:int ret:class+fld:class+fld:class+fld:boolean+fld:boolean+fld:boolean+fld:class+fld:int+fld:class+";
 	
 	private MinecraftBiomeExtractorGUI gui = null;
 	
@@ -41,14 +51,19 @@ public class WorldProcessor implements Runnable
 	private ArrayList<String> classListing;
 	private ArrayList<String> class_signatures;
 	private boolean useGUI = true;
+	private Class<?> saveHandlerClass;
 	private Class<?> minecraftSaveClass;
 	private Class<?> biomeGeneratorClass;
+	private Class<?> abstractSaveHandlerClass;
+	private Class<?> serverRandomClass;
+	private Constructor<?> handleMinecraftSave;
 	private Constructor<?> createMinecraftSave;
 	private Constructor<?> createBiomeGenerator;
 	private Method generateForLoaction;
     private Field loadedField = null;
     private Field genTemp;
     private Field genMoist;
+    private Object saveHandler;
     private Object minecraftSave;
     private Object biomeGenerator;
 	private Object argList[]; // Used to call the biome generator.
@@ -60,10 +75,7 @@ public class WorldProcessor implements Runnable
 	
 	// World Variables
 	private File worldFolder = null;
-	private int chunkMinX = 0;
-	private int chunkMaxX = 0;
-	private int chunkMinZ = 0;
-	private int chunkMaxZ = 0;
+	private ArrayList<int[]> chunks;
 	
 	// Output
 	private File outputDir = null;
@@ -166,10 +178,6 @@ public class WorldProcessor implements Runnable
 	public void run()
 	{
 		// Reset some key variables
-		chunkMinX = 0;
-		chunkMaxX = 0;
-		chunkMinZ = 0;
-		chunkMaxZ = 0;
 		die = false;
 		lastPercent = 0;
 		countPercents = 0;
@@ -183,8 +191,8 @@ public class WorldProcessor implements Runnable
 		
 		if (outputDir == null)
 		{
-			outputDir = new File(worldFolder,"EXTRACTEDBIOMES");
-			printm("No output dir specified. Placing output in "+ outputDir.getAbsolutePath() + NEW_LINE);
+			outputDir = new File(worldFolder,"biomes");
+			printm("No output dir specified." + NEW_LINE + "Placing output in "+ outputDir.getAbsolutePath() + NEW_LINE);
 		}
 		
 		if (outputDir.exists() && flush)
@@ -203,8 +211,9 @@ public class WorldProcessor implements Runnable
 			printe("Minecraft classes failed to load the world."+ NEW_LINE);
 			return;
 		}
-			
-			byte[] data = new byte[32768];
+		
+			// (16 blocks per chunk * 32 chunks per region)^2 * 2 bytes per coord = 524288
+			byte[] data = new byte[524288];
 			byte[] coords = new byte[2];
 			
 			printm("Calculating biome values..."+NEW_LINE);
@@ -220,21 +229,18 @@ public class WorldProcessor implements Runnable
 			
 			printm("Scanning save folder..." + NEW_LINE);
 			
-			this.setupWorldBounds(worldFolder, 0);
-			printm("World Bounds: ( "+ Integer.toString(chunkMinX) + " , " + Integer.toString(chunkMinZ) + " ) to ( " + Integer.toString(chunkMaxX) + " , " + Integer.toString(chunkMaxZ) + " )" + NEW_LINE);
+			this.setupWorldBounds(worldFolder);
+			printm("World Size: "+ Integer.toString(chunks.size()) + " regions" + NEW_LINE);
 			printm("Saving biome data...  (press esc to cancel)" + NEW_LINE);
 			
-			for (int x = (chunkMinX/8-1)*8; x<=((chunkMaxX/8)*8); x=x+8)
-			{
-				for (int z = (chunkMinZ/8-1)*8; z<=((chunkMaxZ/8)*8); z=z+8)
-				{
+			for (int x = 0; x<chunks.size();x++)
+			{		
+					final int fromX = chunks.get(x)[0]*512;
+					final int toX = (chunks.get(x)[0]+1)*512;
+					final int fromZ = chunks.get(x)[1]*512;
+					final int toZ = (chunks.get(x)[1]+1)*512;
 					
-					final int fromX = x*16;
-					final int toX = (x+8)*16;
-					final int fromZ = z*16;
-					final int toZ = (z+8)*16;
-					
-					File biomeFile = new File(outputDir, Integer.toString(x)+"."+Integer.toString(z)+".biome");
+					File biomeFile = new File(outputDir, "b." + Integer.toString(chunks.get(x)[0])+"."+Integer.toString(chunks.get(x)[1])+".biome");
 					
 					if (!biomeFile.exists())
 					{
@@ -243,8 +249,8 @@ public class WorldProcessor implements Runnable
 							for(int j = fromZ; j < toZ; j++)
 							{	
 								coords = getCoordsAtBlock(i,j);
-								data[2*(i-fromX)+(j-fromZ)*256] = coords[1];
-								data[2*(i-fromX)+1+(j-fromZ)*256] = coords[0];
+								data[2*(i-fromX)+(j-fromZ)*1024] = coords[1];
+								data[2*(i-fromX)+1+(j-fromZ)*1024] = coords[0];
 							}
 						}
 					
@@ -253,7 +259,7 @@ public class WorldProcessor implements Runnable
 						try
 						{
 							fileoutputstream = new FileOutputStream(biomeFile);
-							fileoutputstream.write(data, 0, 32768);
+							fileoutputstream.write(data, 0, 524288);
 				            fileoutputstream.close();
 						}
 						catch (Throwable e)
@@ -264,25 +270,21 @@ public class WorldProcessor implements Runnable
 					}
 					
 					// Progress Report (so the user doesn't get too anxious, this can take forever)
-					final int iteration = (z-chunkMinZ) + (x-chunkMinX) * (chunkMaxZ-chunkMinZ);
-					final int totalIteration = (chunkMaxX-chunkMinX)*(chunkMaxZ-chunkMinZ);
-					int percent = (int)(((float)iteration/(float)totalIteration)*100);
+					
+					int percent = (int)(((float)x/(float)chunks.size())*100);
 					if (percent > 100)
 						percent = 100;
 					if (percent-lastPercent >= 1)
 					{
 						if (countPercents%10 == 0)
 							printm(NEW_LINE);
-						printm(Integer.toString((int)(((float)iteration/(float)totalIteration)*100))+"% ... ");
+						printm(Integer.toString(percent)+"% ... ");
 						
-						lastPercent = (int)(((float)iteration/(float)totalIteration)*100);
+						lastPercent = percent;
 						countPercents++;
 					}
 					if (die)
 						break;
-				}
-				if (die)
-					break;
 			}
 			if (!die)
 			{
@@ -319,13 +321,52 @@ public class WorldProcessor implements Runnable
 	
 	public boolean loadWorld()
 	{
+		// Save Handler Arguments
+		//File paramFile, String paramString, boolean paramBoolean
+		Object handlerArgs[] = new Object[3];
+		handlerArgs[0] = worldFolder;
+		handlerArgs[1] = "";
+		handlerArgs[2] = false;
+        
+		try
+		{
+			saveHandler = handleMinecraftSave.newInstance(handlerArgs);
+		}
+		catch (IllegalArgumentException e1)
+		{
+			printe("Minecraft Save handler rejected arguments!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
+			return false;
+		}
+		catch (InstantiationException e1)
+		{
+			printe("Minecraft Save handler failed to instantiate!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
+			return false;
+		}
+		catch (IllegalAccessException e1)
+		{
+			printe("Minecraft Save handler missing!"+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
+			return false;
+		}
+		catch (InvocationTargetException e1)
+		{
+			printe("Minecraft Save handler invocation failed!"+NEW_LINE);
+			printe("Minecraft version was incompatible."+NEW_LINE);
+			return false;
+		}
+		
+		
 		// Creating the Minecraft Save object
-		Object saveArgs[] = new Object[2];
-        saveArgs[0] = worldFolder;
+		//rw paramrw, String paramString, long paramLong)
+		Object saveArgs[] = new Object[3];
+        saveArgs[0] = saveHandler;
         saveArgs[1] = "";
+        saveArgs[2] = 0;
         
 		Object saveArgs2[] = new Object[4];
-        saveArgs2[0] = worldFolder;
+        saveArgs2[0] = saveHandler;
         saveArgs2[1] = "";
         saveArgs2[2] = 0L;
         saveArgs2[3] = null;
@@ -422,40 +463,24 @@ public class WorldProcessor implements Runnable
 		return true;
 	}
 
-	// Setup the min/max chunk values for the currently selected world
-	private void setupWorldBounds(File start, int level)
+	// Setup the chunks for the currently selected world
+	private void setupWorldBounds(File worldFolder)
 	{
-		level++;
-		if (level > 3)
-			return;
-		File[] listing = start.listFiles();
+		chunks = new ArrayList<int[]>();
 		String[] parts;
-		for(int i=0; i<listing.length; i++)
+		File regionFolder = new File(worldFolder,"region");
+		if (regionFolder.isDirectory())
 		{
-			if (listing[i].isDirectory() && !listing[i].getName().startsWith(".") && !listing[i].getName().equalsIgnoreCase("DIM-1"))
+			File[] potentialChunks = regionFolder.listFiles();
+			for(int i=0;i<potentialChunks.length;i++)
 			{
-				setupWorldBounds(listing[i],level);
-			}
-			else if (listing[i].getName().endsWith(".dat") && level==3)
-			{
-				// Decode X,Z and place in max,mins
-				parts = listing[i].getName().split("\\.");
-				if (parts.length>2)
+				parts = potentialChunks[i].getName().split("\\.");
+				if (parts.length==4 && parts[0].equals("r") && parts[3].equals("mcr"))
 				{
-					final int x = Integer.parseInt(parts[1], 36);
-					final int z = Integer.parseInt(parts[2], 36);
-					
-					if (Math.abs(x) < 4096 && Math.abs(z) < 4096)
-					{
-						if (x<chunkMinX)
-							chunkMinX = x;
-						if (x>chunkMaxX)
-							chunkMaxX = x;
-						if (z<chunkMinZ)
-							chunkMinZ = z;
-						if (z>chunkMaxZ)
-							chunkMaxZ = z;
-					}
+					int[] mcrChunk = new int[2];
+					mcrChunk[0] = Integer.parseInt(parts[1]);
+					mcrChunk[1] = Integer.parseInt(parts[2]);
+					chunks.add(mcrChunk);
 				}
 			}
 		}
@@ -790,6 +815,12 @@ public class WorldProcessor implements Runnable
 		
 		// The classes, methods, and fields we need, as strings:
 		// Classes
+		String abstract_save_handler_class = "ec";
+		String abstract_save_handler_class_signature = ABSTRACT_SAVE_HANDLER_REF;
+		
+		String save_handler_class = "ec";
+		String save_handler_class_signature = SAVE_HANDLER_CLASS_REF;
+		
 		String save_class = "cu";
 		String save_class_signature = SAVE_CLASS_REF;
 		
@@ -817,12 +848,58 @@ public class WorldProcessor implements Runnable
 			class_signatures.add(ReflectionUtil.generateClassSignature(classListing.get(i)));
 			
 			// Dump all the class signatures - helpful!
-			//System.out.println(class_listing.get(i));
-			//System.out.println(generateClassSignature(class_listing.get(i)));
-			//System.out.println("\n");
+			if(printClassRefStrings)
+			{
+				System.out.println(classListing.get(i));
+				System.out.println(ReflectionUtil.generateClassSignature(classListing.get(i)));
+				System.out.println("\n");
+			}
 		}
 		
-		int class_id = this.matchClassSignature(save_class_signature);
+		int class_id = this.matchClassSignature(abstract_save_handler_class_signature);
+		if (class_id != -1)
+		{
+			abstract_save_handler_class = classListing.get(class_id);
+			printm("Handler interface is: "+abstract_save_handler_class+NEW_LINE);
+			if (printClassRefStrings)
+				printm(class_signatures.get(class_id)+NEW_LINE);
+		}
+		else
+		{
+			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
+			printe("Signature match for handler class not found."+NEW_LINE);
+			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
+			
+			for (int i=0; i<classListing.size(); i++)
+			{
+				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
+			}
+			return false;
+		}
+		
+		class_id = this.matchClassSignature(save_handler_class_signature);
+		if (class_id != -1)
+		{
+			save_handler_class = classListing.get(class_id);
+			printm("Handler class is: "+save_handler_class+NEW_LINE);
+			if (printClassRefStrings)
+				printm(class_signatures.get(class_id)+NEW_LINE);
+		}
+		else
+		{
+			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
+			printe("Signature match for save class not found."+NEW_LINE);
+			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
+			
+			for (int i=0; i<classListing.size(); i++)
+			{
+				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
+			}
+			return false;
+		}
+		
+		
+		class_id = this.matchClassSignature(save_class_signature);
 		if (class_id != -1)
 		{
 			save_class = classListing.get(class_id);
@@ -862,8 +939,10 @@ public class WorldProcessor implements Runnable
 		
 		try
 		{
+			saveHandlerClass = Class.forName(save_handler_class);
 			minecraftSaveClass = Class.forName(save_class);
 			biomeGeneratorClass = Class.forName(biome_gen_class);
+			abstractSaveHandlerClass = Class.forName(abstract_save_handler_class);
 		}
 		catch (ClassNotFoundException e2)
 		{
@@ -873,11 +952,37 @@ public class WorldProcessor implements Runnable
 			return false;
 		}
 		
-		// Setup the MINECRAFTSAVECLASS constructor
-		// Client
-		Class<?> partypes[] = new Class[2];
+		Class<?> partypes[] = new Class[3];
         partypes[0] = File.class;
         partypes[1] = String.class;
+        partypes[2] = Boolean.TYPE;
+        
+		try
+		{
+			handleMinecraftSave = saveHandlerClass.getConstructor(partypes);
+		}
+		catch (SecurityException e1)
+		{
+			printe("Could not bind MinecraftSaveHandler Constructor (security issue)"+NEW_LINE);
+			printe("I'm trying to delete the Mojang signatures for you."+NEW_LINE);
+			printe("Restart the program and try again."+NEW_LINE);
+			return false;
+		}
+		catch (NoSuchMethodException e1)
+		{
+			// Save handler failed to bind
+			printe("Could not bind MinecraftSaveHandler Constructor."+NEW_LINE);
+			printe("Minecraft version was incompatible"+NEW_LINE);
+			return false;
+		}
+		
+		
+		// Setup the MINECRAFTSAVECLASS constructor
+		// Client
+		partypes = new Class[3];
+        partypes[0] = abstractSaveHandlerClass;
+        partypes[1] = String.class;
+        partypes[2] = Long.TYPE;
         
 		try
 		{
@@ -895,12 +1000,19 @@ public class WorldProcessor implements Runnable
 			// This could mean that you are operating on a server JAR. Try this:
 			try
 			{
-				printm("Looks like this might be a server JAR. Keep trying..."+NEW_LINE);
+				printm("Server software detected."+NEW_LINE);
+				String server_random_class_name = classListing.get(this.matchClassSignature(SERVER_RAND_CLASS_REF));
+				printm("Server random class is: " + server_random_class_name + NEW_LINE);
+				serverRandomClass = Class.forName(server_random_class_name);
+				
+				// Server constructors look like this:
+				//   public cp(mi parammi, String paramString, long paramLong, mn parammn)
+				
 				partypes = new Class[4];
-		        partypes[0] = File.class;
+		        partypes[0] = abstractSaveHandlerClass;
 		        partypes[1] = String.class;
 		        partypes[2] = Long.TYPE;
-				partypes[3] = Class.forName(classListing.get(this.matchClassSignature(SERVER_RAND_CLASS_REF)));
+				partypes[3] = serverRandomClass;
 				createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
 				isServerJar = true;
 				
