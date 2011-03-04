@@ -58,6 +58,12 @@ public class MinecraftBiomeExtractor
 			i++;
 		}
 		
+		if (noGui && worldFolder == null)
+		{
+			System.out.print("You need to specify a world folder to process!");
+			return;
+		}
+		
 		if (outputDir == null)
 		{
 			outputDir = new File(worldFolder, "biomes");
