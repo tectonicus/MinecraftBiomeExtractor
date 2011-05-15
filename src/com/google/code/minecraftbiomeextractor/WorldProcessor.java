@@ -66,7 +66,7 @@ public class WorldProcessor implements Runnable
     private Field genMoist;
     private Object saveHandler;
     private Object minecraftSave;
-    private Object biomeGenerator;
+    private Object biomeGeneratorObject;
 	private Object argList[]; // Used to call the biome generator.
     
     // Storage for the grasscolor and foliagecolor pngs
@@ -444,7 +444,7 @@ public class WorldProcessor implements Runnable
 		bioGenArgs[0] = minecraftSave;
 		try
 		{
-			biomeGenerator = createBiomeGenerator.newInstance(bioGenArgs);
+			biomeGeneratorObject = createBiomeGenerator.newInstance(bioGenArgs);
 		}
 		catch (IllegalArgumentException e1)
 		{
@@ -599,8 +599,8 @@ public class WorldProcessor implements Runnable
 			{
 			  	argList[0] = x;
 				argList[1] = z;
-				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
-				return ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
+				generateForLoaction.invoke(biomeGeneratorObject, argList);  // BiomeGenerator.a(i,j,1,1);
+				return ((double[])genTemp.get(biomeGeneratorObject))[0]; // BiomeGenerator.a[0];
 			}
 			catch (Throwable e)
 			{
@@ -614,8 +614,8 @@ public class WorldProcessor implements Runnable
 		  {
 		  	argList[0] = x;
 			argList[1] = z;
-			generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
-			return ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
+			generateForLoaction.invoke(biomeGeneratorObject, argList);  // BiomeGenerator.a(i,j,1,1);
+			return ((double[])genMoist.get(biomeGeneratorObject))[0]; // BiomeGenerator.b[0];
 		  }
 		  catch (Throwable e)
 		  {
@@ -625,7 +625,7 @@ public class WorldProcessor implements Runnable
 
 	public byte[] getCoordsAtBlock(final int x, final int z) throws Exception // Returns the location of the biome color in the 256x256 biome PNG (an int)
 	{
-		if (biomeGenerator == null)
+		if (biomeGeneratorObject == null)
 			throw new NullPointerException("BiomeGenerator is null!");
 		
 		try
@@ -636,12 +636,12 @@ public class WorldProcessor implements Runnable
 			coords[0] = 0;
 			coords[1] = 0;
 			
-			generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
+			generateForLoaction.invoke(biomeGeneratorObject, argList);  // BiomeGenerator.a(i,j,1,1);
 	
 			double temp, moisture;
 	
-			temp = ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
-			moisture = ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
+			temp = ((double[])genTemp.get(biomeGeneratorObject))[0]; // BiomeGenerator.a[0];
+			moisture = ((double[])genMoist.get(biomeGeneratorObject))[0]; // BiomeGenerator.b[0];
 			
 			// Reconstruct the double-to-int function here
 			moisture *= temp;
@@ -814,7 +814,7 @@ public class WorldProcessor implements Runnable
 		}
 		catch (IOException e)
 		{
-			printe("I can't seem to find your minecraft.jar file!"+NEW_LINE);
+			printe("I can't seem to find your minecraft jar file!"+NEW_LINE);
 		}
 		
 		// The classes, methods, and fields we need, as strings:
