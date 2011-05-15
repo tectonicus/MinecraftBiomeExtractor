@@ -73,6 +73,7 @@ public class MinecraftBiomeExtractor
 		{
 			System.out.println("Minecraft Biome Extractor command line usage:");
 			System.out.println("\tjava -jar MinecraftBiomeExtractor.jar -nogui world_folder [-flush] [-quiet] [-jar jarloaction]");
+			System.out.println("\tYou can use the -jar option to launch the GUI with a manually secified JAR file.");
 		}
 		else if (!noGui)
 		{

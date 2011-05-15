@@ -38,14 +38,17 @@ public class MinecraftUtils
 	{
 		List<File> worldDirs = new ArrayList<File>();
 		File savedir = new File(findMinecraftDir(),"saves");
-		File[] potentialWorlds = savedir.listFiles();
 		
-		for(int i = 0; i< potentialWorlds.length; i++)
+		if (savedir.exists() && savedir.isDirectory())
 		{
-			if (potentialWorlds[i].isDirectory() && (new File(potentialWorlds[i],"level.dat")).exists() && (new File(potentialWorlds[i],"region")).isDirectory())
+			File[] potentialWorlds = savedir.listFiles();
+			for(int i = 0; i< potentialWorlds.length; i++)
 			{
-				// If the potential world is a directory, it contains a level.dat and a region folder
-				worldDirs.add(potentialWorlds[i]);
+				if (potentialWorlds[i].isDirectory() && (new File(potentialWorlds[i],"level.dat")).exists() && (new File(potentialWorlds[i],"region")).isDirectory())
+				{
+					// If the potential world is a directory, it contains a level.dat and a region folder
+					worldDirs.add(potentialWorlds[i]);
+				}
 			}
 		}
 		return worldDirs;
