@@ -82,13 +82,30 @@ public class GeneralTests extends TestCase
 		final boolean worldOk = worldProcessor.loadWorld();
 		assertTrue(worldOk);
 		
-		final double moisture00 = worldProcessor.getMoistureAtBlock(0, 0);
-		final double moisture48 = worldProcessor.getMoistureAtBlock(4, 8);
+		double moisture00 = 0;
+		double moisture48 = 0;
+		try
+		{
+			moisture00 = worldProcessor.getMoistureAtBlock(0, 0);
+			moisture48 = worldProcessor.getMoistureAtBlock(4, 8);
+		}
+		catch (Throwable e)
+		{
+			assertTrue(false);
+		}
 		
 		assertEquals(0.6294117825226543, moisture00);
 		assertEquals(0.6794504557750403, moisture48);
 		
-		Color colour = worldProcessor.getColorAtBlock(0, 0, WorldProcessor.ColourType.GrassColour);
+		Color colour = Color.WHITE;
+		try
+		{
+			colour = worldProcessor.getColorAtBlock(0, 0, WorldProcessor.ColourType.GrassColour);
+		}
+		catch (Throwable e)
+		{
+			assertTrue(false);
+		}
 		assertEquals(119, colour.getRed());
 		assertEquals(196, colour.getGreen());
 		assertEquals(69, colour.getBlue());
@@ -111,8 +128,17 @@ public class GeneralTests extends TestCase
 		final boolean worldOk = worldProcessor.loadWorld();
 		assertTrue(worldOk);
 		
-		final double moisture00 = worldProcessor.getMoistureAtBlock(0, 0);
-		final double moisture48 = worldProcessor.getMoistureAtBlock(4, 8);
+		double moisture00 = 0;
+		double moisture48 = 0;
+		try
+		{
+			moisture00 = worldProcessor.getMoistureAtBlock(0, 0);
+			moisture48 = worldProcessor.getMoistureAtBlock(4, 8);
+		}
+		catch (Throwable e)
+		{
+			assertTrue(false);
+		}
 		
 		assertEquals(0.6294117825226543, moisture00);
 		assertEquals(0.6794504557750403, moisture48);

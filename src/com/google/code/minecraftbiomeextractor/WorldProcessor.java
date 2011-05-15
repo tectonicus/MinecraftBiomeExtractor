@@ -249,7 +249,16 @@ public class WorldProcessor implements Runnable
 						{
 							for(int j = fromZ; j < toZ; j++)
 							{	
-								coords = getCoordsAtBlock(i,j);
+								try
+								{
+									coords = getCoordsAtBlock(i,j);
+								}
+								catch (Throwable e)
+								{
+									printe("Minecraft Biome Extractor has failed you! My apologies."+NEW_LINE);
+									printe("Halting biome extraction. Check online for an update."+NEW_LINE);
+									return;
+								}
 								data[2*(i-fromX)+(j-fromZ)*1024] = coords[1];
 								data[2*(i-fromX)+1+(j-fromZ)*1024] = coords[0];
 							}
@@ -584,95 +593,82 @@ public class WorldProcessor implements Runnable
 	/*
 	 * The manual API
 	 */
-	  public double getTemperatureAtBlock(final int x, final int z) // Returns the temperature (double)
+	  public double getTemperatureAtBlock(final int x, final int z) throws Exception // Returns the temperature (double)
 	  {
-		  	argList[0] = x;
-			argList[1] = z;
 			try
 			{
+			  	argList[0] = x;
+				argList[1] = z;
 				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
-			}
-			catch (Throwable e1)
-			{
-				printe("Could not generate biome vals for coords..."+NEW_LINE);
-			} 
-			
-			try
-			{
 				return ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
 			}
 			catch (Throwable e)
 			{
-				printe("Could not extract temp from generator"+NEW_LINE);
-				return 0;
+				throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getTemperatureAtBlock)"));
 			}
 	  }
 	  
-	  public double getMoistureAtBlock(final int x, final int z) // Returns the moisture (double)
+	  public double getMoistureAtBlock(final int x, final int z) throws Exception // Returns the moisture (double)
 	  {
+		  try
+		  {
 		  	argList[0] = x;
 			argList[1] = z;
-			try
-			{
-				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
-			}
-			catch (Throwable e1)
-			{
-				printe("Could not generate biome vals for coords..."+NEW_LINE);
-			} 
-			
-			try
-			{
-				return ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
-			}
-			catch (Throwable e)
-			{
-				printe("Could not extract moist from generator"+NEW_LINE);
-				return 0;
-			}
+			generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
+			return ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
+		  }
+		  catch (Throwable e)
+		  {
+			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getMoistureAtBlock)"));
+		  }
 	  }
 
-	public byte[] getCoordsAtBlock(final int x, final int z) // Returns the location of the biome color in the 256x256 biome PNG (an int)
+	public byte[] getCoordsAtBlock(final int x, final int z) throws Exception // Returns the location of the biome color in the 256x256 biome PNG (an int)
 	{
 		if (biomeGenerator == null)
 			throw new NullPointerException("BiomeGenerator is null!");
 		
-		argList[0] = x;
-		argList[1] = z;
+		try
+		{
+			argList[0] = x;
+			argList[1] = z;
 			byte[] coords = new byte[2];
 			coords[0] = 0;
 			coords[1] = 0;
-			try
-			{
-				generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
-			}
-			catch (Throwable e1)
-			{
-				printe("Could not generate biome vals for coords..."+NEW_LINE);
-			} 
+			
+			generateForLoaction.invoke(biomeGenerator, argList);  // BiomeGenerator.a(i,j,1,1);
+	
 			double temp, moisture;
-			try
-			{
-				temp = ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
-				moisture = ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
-			}
-			catch (Throwable e)
-			{
-				printe("Could not extract temp/moist from generator"+NEW_LINE);
-				return coords;
-			}
+	
+			temp = ((double[])genTemp.get(biomeGenerator))[0]; // BiomeGenerator.a[0];
+			moisture = ((double[])genMoist.get(biomeGenerator))[0]; // BiomeGenerator.b[0];
 			
 			// Reconstruct the double-to-int function here
 			moisture *= temp;
 			coords[0] = (byte) ((1.0D - temp) * 255.0D);
 			coords[1] = (byte) ((1.0D - moisture) * 255.0D);
 			return coords;
+		}
+		catch (Throwable e)
+		{
+			printe("Details:" + e.getMessage());
+			e.printStackTrace();
+			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getCoordsAtBlock)"));
+		}
 	  }
 	  
 	  // Returns the biome color at a given block, packed in an int as RGB
-	  public int getRGBAtBlock(final int x, final int z, final ColourType type)
+	  public int getRGBAtBlock(final int x, final int z, final ColourType type) throws Exception
 	  {
-		  	final byte[] coords = getCoordsAtBlock(x,z);
+		  final byte[] coords;
+		  try
+		  {
+			  coords = getCoordsAtBlock(x,z);
+		  }
+		  catch (Throwable e1)
+		  {
+			  throw(new Exception("Biome Extractor has failed to properly interface with Minecraft."));
+		  }
 		  	
 			if (type == ColourType.GrassColour)
 				return grassColourImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
@@ -683,9 +679,16 @@ public class WorldProcessor implements Runnable
 	  }
 	  
 	// Returns the biome color at a given block
-	public Color getColorAtBlock(final int x, final int z, final ColourType type)
+	public Color getColorAtBlock(final int x, final int z, final ColourType type) throws Exception
 	{
-		return new Color(getRGBAtBlock(x, z, type));
+		try
+		{
+			return new Color(getRGBAtBlock(x, z, type));
+		}
+		catch (Throwable e1)
+		{
+			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getColorAtBlock)"));
+		}
 	}
 	  
 	public boolean setBiomeImages(final File grasscolor, final File foliagecolor)
