@@ -30,6 +30,11 @@ public class WorldProcessor implements Runnable
 	
 	private static final String NEW_LINE = "\n";
 	
+	// When the time comes to update the class signatures, find out which classes are which (good luck!)
+	// and then set this variable to true and run MBE from the console. Each signature will be printed below 
+	// each class name. Copy them and place them in the proper signature variables. Sometimes
+	// that won't be enough if the update is particularly big. In that case... grab a copy of
+	// your favorite java decompiler and settle in.
 	private static final boolean printClassRefStrings = false;
 	
 	// Client and Common Signatures
@@ -782,7 +787,7 @@ public class WorldProcessor implements Runnable
 		// 2.) Check for MOJANG signatures
 		//		- If they exist rewrite the zip to not include them
 		// 3.) Take a note of all files ending in .class
-		// 4.) Copy grasscolor and foliagecolor to memory.
+		// 4.) Copy grasscolor, foliagecolor and watercolor to memory.
 		// 5.) Close the zip file
 		// 6.) Add minecraft.jar to the classpath
 		// 7.) Scan through and match the save class and biome classes
@@ -818,7 +823,7 @@ public class WorldProcessor implements Runnable
 			
 			ZipFile mcjar = new ZipFile(minecraftJar);
 			
-			// Copy grasscolor.png and foliagecolor.png
+			// Copy grasscolor.png, foliagecolor.png and watercolor.png
 			ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
 			ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
 			ZipEntry watercolor = mcjar.getEntry("misc/watercolor.png");
