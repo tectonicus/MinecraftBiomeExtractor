@@ -24,7 +24,8 @@ public class WorldProcessor implements Runnable
 	public enum ColourType
 	{
 		GrassColour,
-		FoliageColour
+		FoliageColour,
+		WaterColour
 	}
 	
 	private static final String NEW_LINE = "\n";
@@ -71,8 +72,9 @@ public class WorldProcessor implements Runnable
 	private Object argList[]; // Used to call the biome generator.
     
     // Storage for the grasscolor and foliagecolor pngs
-	private BufferedImage grassColourImage = null;
-	private BufferedImage foliageColourImage = null;
+	private BufferedImage grassColorImage = null;
+	private BufferedImage foliageColorImage = null;
+	private BufferedImage waterColorImage = null;
 	private boolean useDefaultBiomeImages = true;
 	
 	// World Variables
@@ -122,8 +124,9 @@ public class WorldProcessor implements Runnable
 	{
 		try
 		{
-			grassColourImage = ImageIO.read(WorldProcessor.class.getResource("/grasscolor_mbe_fallback.png"));
-			foliageColourImage = ImageIO.read(WorldProcessor.class.getResource("/foliagecolor_mbe_fallback.png"));
+			grassColorImage = ImageIO.read(WorldProcessor.class.getResource("/grasscolor_mbe_fallback.png"));
+			foliageColorImage = ImageIO.read(WorldProcessor.class.getResource("/foliagecolor_mbe_fallback.png"));
+			waterColorImage = ImageIO.read(WorldProcessor.class.getResource("/watercolor_mbe_fallback.png"));
 		}
 		catch (IOException e)
 		{
@@ -518,13 +521,17 @@ public class WorldProcessor implements Runnable
 		
 		try
 		{
-			if (grassColourImage != null)
+			if (grassColorImage != null)
 			{
-				ImageIO.write(grassColourImage, "png", new File(biomesFolder,"grasscolor.png"));
+				ImageIO.write(grassColorImage, "png", new File(biomesFolder,"grasscolor.png"));
 			}
-			if (foliageColourImage != null)
+			if (foliageColorImage != null)
 			{
-				ImageIO.write(foliageColourImage, "png", new File(biomesFolder,"foliagecolor.png"));
+				ImageIO.write(foliageColorImage, "png", new File(biomesFolder,"foliagecolor.png"));
+			}
+			if (waterColorImage != null)
+			{
+				ImageIO.write(waterColorImage, "png", new File(biomesFolder,"watercolor.png"));
 			}
 		}
 		catch (IOException e)
@@ -706,9 +713,11 @@ public class WorldProcessor implements Runnable
 		  }
 		  	
 			if (type == ColourType.GrassColour)
-				return grassColourImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
+				return grassColorImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
 			else if (type == ColourType.FoliageColour)
-				return foliageColourImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
+				return foliageColorImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
+			else if (type == ColourType.WaterColour)
+				return waterColorImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
 			else
 				return 0;
 	  }
@@ -726,17 +735,21 @@ public class WorldProcessor implements Runnable
 		}
 	}
 	  
-	public boolean setBiomeImages(final File grasscolor, final File foliagecolor)
+	public boolean setBiomeImages(final File grasscolor, final File foliagecolor, final File watercolor)
 	{
 			try 
 			{
 				if (grasscolor != null)
 				{
-					grassColourImage = ImageIO.read(grasscolor);
+					grassColorImage = ImageIO.read(grasscolor);
 				}
 				if (foliagecolor != null)
 				{
-					foliageColourImage = ImageIO.read(foliagecolor);
+					foliageColorImage = ImageIO.read(foliagecolor);
+				}
+				if (watercolor != null)
+				{
+					waterColorImage = ImageIO.read(foliagecolor);
 				}
 			} 
 			catch (IOException e) 
@@ -798,6 +811,7 @@ public class WorldProcessor implements Runnable
 			// Copy grasscolor.png and foliagecolor.png
 			ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
 			ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
+			ZipEntry watercolor = mcjar.getEntry("misc/watercolor.png");
 			
 			// TODO: This doesn't close the input streams properly
 
@@ -805,12 +819,17 @@ public class WorldProcessor implements Runnable
 			// and they are not already loaded (from the setBiomeImages method, for example).
 			if (grasscolor != null && useDefaultBiomeImages)
 			{
-				grassColourImage = ImageIO.read(mcjar.getInputStream(grasscolor));
+				grassColorImage = ImageIO.read(mcjar.getInputStream(grasscolor));
 			}
 			if (foliagecolor != null && useDefaultBiomeImages)
 			{
-				foliageColourImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
+				foliageColorImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
 			}
+			if (watercolor != null && useDefaultBiomeImages)
+			{
+				waterColorImage = ImageIO.read(mcjar.getInputStream(watercolor));
+			}
+			
 			
 			// Scan the jar file and gather a class listing
 			
