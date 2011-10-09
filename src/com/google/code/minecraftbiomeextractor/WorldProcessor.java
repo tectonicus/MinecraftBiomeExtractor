@@ -32,11 +32,12 @@ public class WorldProcessor implements Runnable
 	private static final boolean printClassRefStrings = false;
 	
 	// Client and Common Signatures
-	// Class names as of 1.3_01
-	/*ec*/private static final String SAVE_HANDLER_CLASS_REF = "carg:class carg:class carg:boolean +ret:class+ret:void+arg:class ret:interface+ret:class+arg:class arg:interface ret:void+arg:class ret:void+ret:void+fld:class+fld:class+fld:class+fld:long+";
-	/*rw*/private static final String ABSTRACT_SAVE_HANDLER_REF = "ret:class+ret:void+arg:class ret:interface+arg:class arg:interface ret:void+arg:class ret:void+";
-	/*dt*/private static final String SAVE_CLASS_REF = "carg:class carg:class +carg:interface carg:class carg:long +carg:interface carg:class carg:long carg:class +carg:interface carg:class carg:class carg:long +arg:int arg:int arg:int ret:boolean+ret:void+ret:long+arg:int arg:int arg:int ret:boolean+ret:interface+arg:int arg:int ret:class+arg:float ret:class+arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:float+arg:class ret:void+arg:class ret:boolean+arg:int arg:int arg:int arg:class ret:void+arg:class arg:int arg:int arg:int arg:int ret:void+ret:interface+arg:class ret:void+arg:class ret:boolean+arg:int arg:int ret:class+arg:interface ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:float+arg:interface ret:void+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:class ret:int+arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:class ret:interface+arg:int arg:int arg:int ret:class+arg:class arg:class ret:boolean+arg:int arg:int arg:int ret:boolean+ret:long+ret:class+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:boolean+ret:boolean+arg:class arg:double arg:double arg:double arg:double arg:double arg:double ret:void+arg:int arg:int ret:int+arg:class ret:void+arg:boolean arg:interface ret:void+arg:int ret:boolean+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:boolean ret:int+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int ret:int+arg:class arg:class ret:class+arg:class arg:class arg:boolean ret:class+arg:class arg:class arg:float arg:float ret:void+arg:double arg:double arg:double arg:class arg:float arg:float ret:void+arg:class arg:int arg:int arg:int ret:void+ret:class+arg:class ret:boolean+arg:interface ret:void+arg:class arg:class ret:interface+arg:float ret:int+arg:class arg:float ret:class+arg:class arg:boolean ret:void+arg:class ret:boolean+arg:class arg:class arg:class ret:boolean+arg:class arg:class ret:boolean+arg:class arg:double arg:double arg:double arg:float ret:class+arg:class arg:double arg:double arg:double arg:float arg:boolean ret:class+arg:class arg:class ret:float+arg:class ret:class+arg:int arg:int arg:int arg:class ret:void+arg:interface ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int arg:boolean ret:void+arg:boolean arg:boolean ret:void+arg:boolean ret:boolean+arg:class arg:class ret:interface+arg:interface ret:void+arg:int arg:int arg:int arg:int arg:boolean ret:boolean+arg:class arg:class arg:float ret:class+arg:class arg:int arg:int arg:int arg:float ret:class+arg:class arg:double ret:class+arg:double arg:double arg:double arg:double ret:class+arg:int arg:int arg:int arg:int arg:int arg:int arg:class ret:void+arg:long ret:void+arg:class ret:void+arg:class arg:int arg:int arg:int ret:boolean+arg:class arg:byte ret:void+arg:int arg:int arg:int ret:void+ret:void+ret:void+ret:interface+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:void+ret:boolean+arg:int arg:int arg:int arg:int ret:void+ret:class+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+ret:void+ret:class+arg:class ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:float+arg:int arg:int arg:int ret:int+ret:boolean+arg:int arg:int ret:int+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int arg:int ret:boolean+ret:void+ret:class+arg:int arg:int arg:int ret:void+ret:void+arg:float ret:class+arg:int arg:int arg:int arg:int arg:int ret:void+ret:void+arg:class ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:int+ret:void+arg:class ret:void+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int ret:int+ret:void+arg:int arg:int arg:int ret:class+fld:boolean+fld:interface+fld:interface+fld:interface+fld:class+fld:interface+fld:interface+fld:interface+fld:long+fld:int+fld:int+fld:int+fld:boolean+fld:long+fld:int+fld:int+fld:class+fld:boolean+fld:class+fld:interface+fld:interface+fld:interface+fld:class+fld:boolean+fld:boolean+fld:class+fld:int+fld:boolean+fld:boolean+fld:int+fld:interface+fld:int+fld:interface+fld:boolean+";
-	/*su*/private static final String BIOME_GEN_CLASS_REF = "+carg:class +arg:int arg:int ret:double+arg:int arg:int ret:class+arg:class ret:class+arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:class+";
+	// Class names as of 1.8.1
+	/*dd*/private static final String SAVE_HANDLER_CLASS_REF = "carg:class carg:class carg:boolean +ret:class+ret:void+ret:void+ret:class+arg:class ret:interface+arg:class arg:interface ret:void+arg:class ret:void+arg:class ret:class+fld:class+fld:class+fld:class+fld:class+fld:long+";
+	/*acq*/private static final String ABSTRACT_SAVE_HANDLER_REF = "ret:class+ret:void+arg:class ret:interface+arg:class arg:interface ret:void+arg:class ret:void+arg:class ret:class+";
+	/*rv*/private static final String SAVE_CLASS_REF = "carg:interface carg:class carg:class carg:class +carg:class carg:class +carg:interface carg:class carg:class +carg:interface carg:class carg:class carg:class +ret:boolean+ret:boolean+ret:boolean+ret:void+ret:void+arg:int ret:boolean+arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:float+arg:class ret:void+arg:float ret:float+arg:class ret:boolean+ret:void+arg:class arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:float ret:float+ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+arg:float ret:void+arg:int arg:int arg:int ret:int+ret:class+arg:int arg:int arg:int ret:void+ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:float ret:float+arg:int arg:int arg:int ret:boolean+ret:long+ret:class+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:class+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:class arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:int+arg:class ret:void+arg:interface ret:void+arg:float ret:float+arg:class ret:boolean+arg:class arg:class ret:boolean+arg:int arg:int arg:int ret:class+arg:class arg:class ret:interface+arg:int arg:int arg:int arg:class ret:void+arg:class ret:int+arg:interface ret:void+arg:class ret:int+ret:int+arg:int arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:void+arg:float ret:class+arg:int arg:int ret:int+arg:class ret:void+ret:void+arg:int arg:int arg:int arg:int arg:int ret:void+ret:interface+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:int+arg:class ret:void+arg:float ret:float+arg:int arg:int arg:int arg:int arg:int arg:int ret:int+ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:int+arg:class ret:boolean+arg:float ret:class+arg:int arg:int ret:int+arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:int+ret:class+arg:int arg:int arg:int ret:void+ret:void+ret:class+arg:int arg:int ret:int+arg:class ret:void+arg:boolean arg:interface ret:void+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:boolean ret:int+arg:class arg:int arg:int arg:int ret:int+arg:class arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:float+arg:class arg:class ret:class+arg:class arg:class arg:boolean ret:class+arg:class arg:class arg:boolean arg:boolean ret:class+arg:class arg:class arg:float arg:float ret:void+arg:double arg:double arg:double arg:class arg:float arg:float ret:void+arg:class arg:int arg:int arg:int ret:void+arg:class arg:double arg:double arg:double arg:double arg:double arg:double ret:void+arg:class ret:boolean+arg:interface ret:void+arg:class arg:class ret:interface+arg:float ret:int+arg:class arg:float ret:class+arg:int arg:int arg:int arg:int arg:int ret:void+arg:interface ret:void+arg:class arg:boolean ret:void+arg:class ret:boolean+arg:class arg:class arg:class ret:boolean+arg:class arg:class ret:boolean+arg:class arg:double arg:double arg:double arg:float ret:class+arg:class arg:double arg:double arg:double arg:float arg:boolean ret:class+arg:class arg:class ret:float+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class ret:class+arg:int arg:int arg:int arg:class ret:void+arg:class ret:void+arg:interface ret:void+arg:boolean arg:boolean ret:void+arg:int arg:int arg:int arg:int arg:int arg:int ret:int+arg:boolean ret:boolean+arg:class arg:class ret:interface+arg:interface ret:void+arg:int arg:int arg:int arg:int arg:boolean arg:int ret:boolean+arg:class arg:class arg:float ret:class+arg:class arg:int arg:int arg:int arg:float ret:class+arg:class arg:double ret:class+arg:double arg:double arg:double arg:double ret:class+arg:class ret:class+arg:int arg:int arg:int arg:int arg:int arg:int arg:class ret:void+arg:long ret:void+arg:class ret:void+arg:class arg:int arg:int arg:int ret:boolean+arg:class arg:byte ret:void+arg:class arg:class ret:void+arg:class arg:class ret:class+arg:class arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:float+arg:int arg:int arg:int ret:boolean+ret:void+arg:class ret:void+ret:long+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int ret:void+ret:interface+arg:int arg:int arg:int ret:boolean+ret:void+ret:void+ret:void+ret:interface+ret:class+arg:int arg:int arg:int ret:class+ret:boolean+ret:void+fld:int+fld:int+fld:int+fld:int+fld:int+fld:boolean+fld:interface+fld:interface+fld:class+fld:interface+fld:interface+fld:interface+fld:interface+fld:interface+fld:interface+fld:long+fld:int+fld:int+fld:int+fld:float+fld:float+fld:float+fld:float+fld:int+fld:int+fld:boolean+fld:long+fld:int+fld:int+fld:class+fld:boolean+fld:class+fld:interface+fld:interface+fld:interface+fld:class+fld:boolean+fld:boolean+fld:class+fld:class+fld:boolean+fld:boolean+fld:boolean+fld:interface+fld:int+fld:class+fld:interface+fld:boolean+fld:double+fld:double+fld:double+";
+	/*dx*/private static final String SAVE_EXTRA_CLASS_REF = "carg:long carg:int carg:boolean +ret:boolean+ret:int+ret:long+fld:long+fld:int+fld:boolean+";
+	/*nu*/private static final String BIOME_GEN_CLASS_REF = "+carg:class +arg:int arg:int ret:float+arg:class arg:int arg:int arg:int arg:int ret:class+arg:int arg:int ret:float+arg:class arg:int arg:int arg:int arg:int ret:class+ret:void+ret:interface+arg:class ret:class+arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int arg:boolean ret:class+arg:int arg:int arg:int arg:interface ret:boolean+arg:int arg:int arg:int arg:interface arg:class ret:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:interface+fld:class+";
 	
 	// Server-Specific Signatures
 	/*cw*/ // Server save handler - client works fine
@@ -54,16 +55,16 @@ public class WorldProcessor implements Runnable
 	private boolean useGUI = true;
 	private Class<?> saveHandlerClass;
 	private Class<?> minecraftSaveClass;
+	private Class<?> saveExtraClass;
 	private Class<?> biomeGeneratorClass;
 	private Class<?> abstractSaveHandlerClass;
 	private Class<?> serverRandomClass;
 	private Constructor<?> handleMinecraftSave;
 	private Constructor<?> createMinecraftSave;
 	private Constructor<?> createBiomeGenerator;
-	private Method generateForLoaction;
+    private Method genTemp;
+    private Method genMoist;
     private Field loadedField = null;
-    private Field genTemp;
-    private Field genMoist;
     private Object saveHandler;
     private Object minecraftSave;
     private Object biomeGeneratorObject;
@@ -133,11 +134,12 @@ public class WorldProcessor implements Runnable
 	private void setupBiomeGenArgs()
 	{
         // Setup a parameter array we'll use later when invoking it
-        argList = new Object[4];
-        argList[0] = Integer.valueOf(0);
+        argList = new Object[5];
+		argList[0] = null;
         argList[1] = Integer.valueOf(0);
-        argList[2] = Integer.valueOf(1);
+        argList[2] = Integer.valueOf(0);
         argList[3] = Integer.valueOf(1);
+        argList[4] = Integer.valueOf(1);
 	}
 	
 	public boolean isBound()
@@ -215,7 +217,6 @@ public class WorldProcessor implements Runnable
 		
 			// (16 blocks per chunk * 32 chunks per region)^2 * 2 bytes per coord = 524288
 			byte[] data = new byte[524288];
-			byte[] coords = new byte[2];
 			
 			printm("Calculating biome values..."+NEW_LINE);
 			
@@ -234,33 +235,36 @@ public class WorldProcessor implements Runnable
 			printm("World Size: "+ Integer.toString(chunks.size()) + " regions" + NEW_LINE);
 			printm("Saving biome data...  (press esc to cancel)" + NEW_LINE);
 			
+			ByteCoord[] coords = new ByteCoord[512 * 512];
+			float[] temps = new float[512 * 512];
+			float[] moists = new float[512 * 512];
+			
 			for (int x = 0; x<chunks.size();x++)
 			{		
 					final int fromX = chunks.get(x)[0]*512;
-					final int toX = (chunks.get(x)[0]+1)*512;
 					final int fromZ = chunks.get(x)[1]*512;
-					final int toZ = (chunks.get(x)[1]+1)*512;
 					
 					File biomeFile = new File(outputDir, "b." + Integer.toString(chunks.get(x)[0])+"."+Integer.toString(chunks.get(x)[1])+".biome");
 					
 					if (!biomeFile.exists())
 					{
-						for(int i = fromX; i < toX; i++)
+						try
 						{
-							for(int j = fromZ; j < toZ; j++)
+							getCoordsAtBlocks(coords, temps, moists, fromX, fromZ, 512, 512);
+						}
+						catch (Throwable e)
+						{
+							printe("Minecraft Biome Extractor has failed you! My apologies."+NEW_LINE);
+							printe("Halting biome extraction. Check online for an update."+NEW_LINE);
+							return;
+						}
+						
+						for(int i = 0; i < 512; i++)
+						{
+							for(int j = 0; j < 512; j++)
 							{	
-								try
-								{
-									coords = getCoordsAtBlock(i,j);
-								}
-								catch (Throwable e)
-								{
-									printe("Minecraft Biome Extractor has failed you! My apologies."+NEW_LINE);
-									printe("Halting biome extraction. Check online for an update."+NEW_LINE);
-									return;
-								}
-								data[2*(i-fromX)+(j-fromZ)*1024] = coords[1];
-								data[2*(i-fromX)+1+(j-fromZ)*1024] = coords[0];
+								data[2*i + j*1024] = coords[i + 512*j].y;
+								data[2*i + 1 + j*1024] = coords[i + 512*j].x;
 							}
 						}
 					
@@ -373,12 +377,12 @@ public class WorldProcessor implements Runnable
 		Object saveArgs[] = new Object[3];
         saveArgs[0] = saveHandler;
         saveArgs[1] = "";
-        saveArgs[2] = 0;
+        saveArgs[2] = null;
         
 		Object saveArgs2[] = new Object[4];
         saveArgs2[0] = saveHandler;
         saveArgs2[1] = "";
-        saveArgs2[2] = 0L;
+        saveArgs2[2] = null;
         saveArgs2[3] = null;
       
 		try
@@ -593,69 +597,100 @@ public class WorldProcessor implements Runnable
 	/*
 	 * The manual API
 	 */
+	public float[] getTemperaturesAtBlocks(float[] dest, final int x, final int z, final int dx, final int dz) throws Exception // Returns a block of temperatures (float)
+	{
+		try
+		{
+			argList[0] = dest;
+			argList[1] = x;
+			argList[2] = z;
+			argList[3] = dx;
+			argList[4] = dz;
+			
+			return (float[])(genTemp.invoke(biomeGeneratorObject, argList));
+		}
+		catch (Throwable e)
+		{
+			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getTemperaturesAtBlock)"));
+		}
+	}
+	
 	  public double getTemperatureAtBlock(final int x, final int z) throws Exception // Returns the temperature (double)
 	  {
-			try
-			{
-			  	argList[0] = x;
-				argList[1] = z;
-				generateForLoaction.invoke(biomeGeneratorObject, argList);  // BiomeGenerator.a(i,j,1,1);
-				return ((double[])genTemp.get(biomeGeneratorObject))[0]; // BiomeGenerator.a[0];
-			}
-			catch (Throwable e)
-			{
-				throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getTemperatureAtBlock)"));
-			}
+		  float[] temps = getTemperaturesAtBlocks(null, x, z, 1, 1);
+		  return (double)(temps[0]);
 	  }
 	  
+	public float[] getMoisturesAtBlocks(float[] dest, final int x, final int z, final int dx, final int dz) throws Exception // Returns a block of moistures (double)
+	{
+		try
+		{
+			argList[0] = dest;
+			argList[1] = x;
+			argList[2] = z;
+			argList[3] = dx;
+			argList[4] = dz;
+			
+			return (float[])(genMoist.invoke(biomeGeneratorObject, argList));
+		}
+		catch (Throwable e)
+		{
+			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getMoisturesAtBlocks)"));
+		}
+	}
+	
 	  public double getMoistureAtBlock(final int x, final int z) throws Exception // Returns the moisture (double)
 	  {
-		  try
-		  {
-		  	argList[0] = x;
-			argList[1] = z;
-			generateForLoaction.invoke(biomeGeneratorObject, argList);  // BiomeGenerator.a(i,j,1,1);
-			return ((double[])genMoist.get(biomeGeneratorObject))[0]; // BiomeGenerator.b[0];
-		  }
-		  catch (Throwable e)
-		  {
-			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getMoistureAtBlock)"));
-		  }
+		  float[] moists = getMoisturesAtBlocks(null, x, z, 1, 1);
+		  return (double)(moists[0]);
 	  }
-
-	public byte[] getCoordsAtBlock(final int x, final int z) throws Exception // Returns the location of the biome color in the 256x256 biome PNG (an int)
+	
+	public ByteCoord[] getCoordsAtBlocks(ByteCoord[] dest, float[] temps, float[] moists, final int x, final int z, final int dx, final int dz) throws Exception // Returns the location of a whole set of blocks, efficiently
 	{
 		if (biomeGeneratorObject == null)
 			throw new NullPointerException("BiomeGenerator is null!");
 		
+		if (dest == null || dest.length != dx * dz)
+			dest = new ByteCoord[dx * dz];
+		
 		try
 		{
-			argList[0] = x;
-			argList[1] = z;
-			byte[] coords = new byte[2];
-			coords[0] = 0;
-			coords[1] = 0;
+			temps = getTemperaturesAtBlocks(temps, x, z, dx, dz);
+			moists = getMoisturesAtBlocks(moists, x, z, dx, dz);
 			
-			generateForLoaction.invoke(biomeGeneratorObject, argList);  // BiomeGenerator.a(i,j,1,1);
-	
-			double temp, moisture;
-	
-			temp = ((double[])genTemp.get(biomeGeneratorObject))[0]; // BiomeGenerator.a[0];
-			moisture = ((double[])genMoist.get(biomeGeneratorObject))[0]; // BiomeGenerator.b[0];
+			for (int i = 0; i < dx * dz; i++)
+			{
+				byte coordx = (byte) ((1.0 - temps[i]) * 255.0);
+				byte coordy = (byte) ((1.0 - (moists[i] * temps[i])) * 255.0);
+
+				if (dest[i] == null)
+				{
+					dest[i] = new ByteCoord(coordx, coordy);
+				} else {
+					dest[i].x = coordx;
+					dest[i].y = coordy;
+				}
+			}
 			
-			// Reconstruct the double-to-int function here
-			moisture *= temp;
-			coords[0] = (byte) ((1.0D - temp) * 255.0D);
-			coords[1] = (byte) ((1.0D - moisture) * 255.0D);
-			return coords;
+			return dest;
 		}
 		catch (Throwable e)
 		{
 			printe("Details:" + e.getMessage());
 			e.printStackTrace();
-			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getCoordsAtBlock)"));
+			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getCoordsAtBlocks)"));
 		}
-	  }
+	}			
+	
+	public byte[] getCoordsAtBlock(final int x, final int z) throws Exception // Returns the location of the biome color in the 256x256 biome PNG (two bytes)
+	{
+		ByteCoord[] coords = getCoordsAtBlocks(null, null, null, x, z, 1, 1);
+		byte[] coords_translated = new byte[2];
+		
+		coords_translated[0] = coords[0].x;
+		coords_translated[1] = coords[0].y;
+		return coords_translated;
+	}
 	  
 	  // Returns the biome color at a given block, packed in an int as RGB
 	  public int getRGBAtBlock(final int x, final int z, final ColourType type) throws Exception
@@ -819,31 +854,31 @@ public class WorldProcessor implements Runnable
 		
 		// The classes, methods, and fields we need, as strings:
 		// Classes
-		String abstract_save_handler_class = "ec";
+		String abstract_save_handler_class = "acq";
 		String abstract_save_handler_class_signature = ABSTRACT_SAVE_HANDLER_REF;
 		
-		String save_handler_class = "ec";
+		String save_handler_class = "dd";
 		String save_handler_class_signature = SAVE_HANDLER_CLASS_REF;
 		
-		String save_class = "cu";
+		String save_class = "rv";
 		String save_class_signature = SAVE_CLASS_REF;
 		
-		String biome_gen_class = "pb";
+		String save_extra_class = "dx";
+		String save_extra_class_signature = SAVE_EXTRA_CLASS_REF;
+		
+		String biome_gen_class = "nu";
 		String biome_gen_class_signature = BIOME_GEN_CLASS_REF;
 		
 		// Methods
 		// This is unlikely to change so I don't need to detect it.
-		String biome_generator = "a";
+		String biome_generator_temp = "a";
+		String biome_generator_moist = "b";
 		
 		//Fields
 		// Typically the not loaded flag is the 3rd boolean in the save class
 		String save_notloaded = "q";
 		String save_notloaded_type = "boolean";
 		int save_notloaded_count = 3;
-		
-		// I doubt these will change. I'll deal with it later.
-		String biome_gen_temp = "a";
-		String biome_gen_moist = "b";
 		
 		class_signatures = new ArrayList<String>();
 		
@@ -923,6 +958,27 @@ public class WorldProcessor implements Runnable
 			}
 			return false;
 		}
+
+		class_id = this.matchClassSignature(save_extra_class_signature);
+		if (class_id != -1)
+		{
+			save_extra_class = classListing.get(class_id);
+			printm("Save-extra class is: "+save_extra_class+NEW_LINE);
+			if (printClassRefStrings)
+				printm(class_signatures.get(class_id)+NEW_LINE);
+		}
+		else
+		{
+			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
+			printe("Signature match for save-extra class not found."+NEW_LINE);
+			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
+			
+			for (int i=0; i<classListing.size(); i++)
+			{
+				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
+			}
+			return false;
+		}
 		
 		class_id = this.matchClassSignature(biome_gen_class_signature);
 		if (class_id != -1)
@@ -945,6 +1001,7 @@ public class WorldProcessor implements Runnable
 		{
 			saveHandlerClass = Class.forName(save_handler_class);
 			minecraftSaveClass = Class.forName(save_class);
+			saveExtraClass = Class.forName(save_extra_class);
 			biomeGeneratorClass = Class.forName(biome_gen_class);
 			abstractSaveHandlerClass = Class.forName(abstract_save_handler_class);
 		}
@@ -986,7 +1043,7 @@ public class WorldProcessor implements Runnable
 		partypes = new Class[3];
         partypes[0] = abstractSaveHandlerClass;
         partypes[1] = String.class;
-        partypes[2] = Long.TYPE;
+        partypes[2] = saveExtraClass;
         
 		try
 		{
@@ -1015,7 +1072,7 @@ public class WorldProcessor implements Runnable
 				partypes = new Class[4];
 		        partypes[0] = abstractSaveHandlerClass;
 		        partypes[1] = String.class;
-		        partypes[2] = Long.TYPE;
+		        partypes[2] = saveExtraClass;
 				partypes[3] = serverRandomClass;
 				createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
 				isServerJar = true;
@@ -1064,17 +1121,19 @@ public class WorldProcessor implements Runnable
 			printm("Trying anyway..."+NEW_LINE);
 		}
 		
-		 // Binding the method that generates the biomes
+		// Binding the method that generates the biomes
         // Setup the parameters the methods takes
-        partypes = new Class[4];
-        partypes[0] = Integer.TYPE;
+        partypes = new Class[5];
+		partypes[0] = float[].class;
         partypes[1] = Integer.TYPE;
         partypes[2] = Integer.TYPE;
         partypes[3] = Integer.TYPE;
+        partypes[4] = Integer.TYPE;
         
         // Create the method object
 		try {
-			generateForLoaction = biomeGeneratorClass.getMethod(biome_generator, partypes);
+			genTemp = biomeGeneratorClass.getMethod(biome_generator_temp, partypes);
+			genMoist = biomeGeneratorClass.getMethod(biome_generator_moist, partypes);
 		} catch (SecurityException e1) {
 			printe("Failed to setup biogen method!"+NEW_LINE);
 			printe("Minecraft version was incompatible"+NEW_LINE);
@@ -1085,19 +1144,6 @@ public class WorldProcessor implements Runnable
 			return false;
 		}
 		
-        // Binding the fields that read out the temperature and moisture
-		try {
-			genTemp = biomeGeneratorClass.getField(biome_gen_temp);
-			genMoist = biomeGeneratorClass.getField(biome_gen_moist);
-		} catch (SecurityException e1) {
-			printe("Failed to setup temp/moist fields!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		} catch (NoSuchFieldException e1) {
-			printe("Failed to setup temp/moist fields!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
 		printm("Ready!"+NEW_LINE+NEW_LINE);
 		
 		bound = true;

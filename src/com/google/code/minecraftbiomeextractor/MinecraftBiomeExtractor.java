@@ -84,6 +84,9 @@ public class MinecraftBiomeExtractor
 		}
 		else
 		{
+			// prevent OSX (and others) from opening a GUI
+			System.setProperty("java.awt.headless", "true");
+			
 			if (worldFolder.isDirectory())
 			{
 				// Create a world processor and bind to minecraft
@@ -104,6 +107,11 @@ public class MinecraftBiomeExtractor
 					worldProcessor.setWorldFolder(worldFolder);
 					worldProcessor.setOutputDir(outputDir);
 					worldProcessor.run();
+					
+					// for some reason (on 1.9pre) java will hang FOREVER at the
+					// end of this function unless this call is here
+					// (this is a hack, though)
+					System.exit(0);
 				}
 			}
 			else
@@ -112,5 +120,4 @@ public class MinecraftBiomeExtractor
 			}
 		}
 	}
-
 }

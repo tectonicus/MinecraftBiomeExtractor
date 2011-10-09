@@ -26,8 +26,11 @@
 		<copydir dest="${FactoryFloor}/Temp" src="${Resources}"/>
 		
 		<jar destfile="${FactoryFloor}/BiomeExtractor.jar"
-				basedir="${FactoryFloor}/Temp"
-		/>
+				basedir="${FactoryFloor}/Temp">
+		  <manifest>
+			<attribute name="Main-Class" value="com.google.code.minecraftbiomeextractor.MinecraftBiomeExtractor"/>
+		  </manifest>
+		</jar>
 		
 		<copy file="${FactoryFloor}/BiomeExtractor.jar" todir="${Dist}" />
 		
