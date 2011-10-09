@@ -97,8 +97,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		// Create our escape key listener
 		log.addKeyListener( new KeyHandler() );
 		
-		log.append("Minecraft Biome Extractor (v0.8.0 beta)"+newline);
-		log.append("By Donkey Kong"+newline+newline);
+		log.append("Minecraft Biome Extractor (v0.9.0)"+newline+newline);
 		
 		log.repaint();
 		
