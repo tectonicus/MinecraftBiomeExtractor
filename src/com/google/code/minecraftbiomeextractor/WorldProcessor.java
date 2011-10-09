@@ -506,7 +506,7 @@ public class WorldProcessor implements Runnable
     
     
     // If no EXTRACTEDBIOMES folder exists, make one.
-    // Copy in grasscolor.png and foliagecolor.png
+    // Copy in grasscolor.png, foliagecolor.png, and watercolor.png
     private void setupDataFolder(final File biomesFolder)
     {
 		if (!(biomesFolder.exists() && biomesFolder.isDirectory()))
@@ -733,6 +733,16 @@ public class WorldProcessor implements Runnable
 		{
 			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getColorAtBlock)"));
 		}
+	}
+	
+	public boolean setBiomeImages(final File grasscolor)
+	{
+		return setBiomeImages(grasscolor, null, null);
+	}
+	
+	public boolean setBiomeImages(final File grasscolor, final File foliagecolor)
+	{
+		return setBiomeImages(grasscolor, foliagecolor, null);
 	}
 	  
 	public boolean setBiomeImages(final File grasscolor, final File foliagecolor, final File watercolor)
