@@ -25,10 +25,6 @@ tasks.withType<JavaCompile>().configureEach {
 	options.encoding = "UTF-8"
 }
 
-tasks.compileJava {
-	options.release.set(8)
-}
-
 val generateBuildInfo = tasks.register<WriteProperties>("generateBuildInfo") {
 	destinationFile.set(layout.buildDirectory.file("generated/build-info/biomeextractor.buildInfo"))
 	property("version", project.version.toString())
