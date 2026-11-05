@@ -1,25 +1,25 @@
-package com.google.code.minecraftbiomeextractor;
+package biomeextractor;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-public class WorldProcessor implements Runnable
+public class WorldProcessor implements Runnable, AutoCloseable
 {
 	public enum ColourType
 	{
@@ -30,53 +30,16 @@ public class WorldProcessor implements Runnable
 	
 	private static final String NEW_LINE = "\n";
 	
-	// When the time comes to update the class signatures, find out which classes are which (good luck!)
-	// and then set this variable to true and run MBE from the console. Each signature will be printed below 
-	// each class name. Copy them and place them in the proper signature variables. Sometimes
-	// that won't be enough if the update is particularly big. In that case... grab a copy of
-	// your favorite java decompiler and settle in.
-	private static final boolean printClassRefStrings = false;
-	
-	// Client and Common Signatures
-	// Class names as of 1.8.1
-	/*dd*/private static final String SAVE_HANDLER_CLASS_REF = "carg:class carg:class carg:boolean +ret:class+ret:void+ret:void+ret:class+arg:class ret:interface+arg:class arg:interface ret:void+arg:class ret:void+arg:class ret:class+fld:class+fld:class+fld:class+fld:class+fld:long+";
-	/*acq*/private static final String ABSTRACT_SAVE_HANDLER_REF = "ret:class+ret:void+arg:class ret:interface+arg:class arg:interface ret:void+arg:class ret:void+arg:class ret:class+";
-	/*rv*/private static final String SAVE_CLASS_REF = "carg:interface carg:class carg:class carg:class +carg:class carg:class +carg:interface carg:class carg:class +carg:interface carg:class carg:class carg:class +ret:boolean+ret:boolean+ret:boolean+ret:void+ret:void+arg:int ret:boolean+arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:float+arg:class ret:void+arg:float ret:float+arg:class ret:boolean+ret:void+arg:class arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:float ret:float+ret:void+arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+arg:float ret:void+arg:int arg:int arg:int ret:int+ret:class+arg:int arg:int arg:int ret:void+ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:boolean+ret:void+arg:float ret:float+arg:int arg:int arg:int ret:boolean+ret:long+ret:class+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:class+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:class arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:int ret:int+arg:class ret:void+arg:interface ret:void+arg:float ret:float+arg:class ret:boolean+arg:class arg:class ret:boolean+arg:int arg:int arg:int ret:class+arg:class arg:class ret:interface+arg:int arg:int arg:int arg:class ret:void+arg:class ret:int+arg:interface ret:void+arg:class ret:int+ret:int+arg:int arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:void+arg:float ret:class+arg:int arg:int ret:int+arg:class ret:void+ret:void+arg:int arg:int arg:int arg:int arg:int ret:void+ret:interface+arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int ret:int+arg:class ret:void+arg:float ret:float+arg:int arg:int arg:int arg:int arg:int arg:int ret:int+ret:void+arg:int arg:int arg:int arg:int ret:boolean+arg:int arg:int arg:int ret:int+arg:class ret:boolean+arg:float ret:class+arg:int arg:int ret:int+arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:int+ret:class+arg:int arg:int arg:int ret:void+ret:void+ret:class+arg:int arg:int ret:int+arg:class ret:void+arg:boolean arg:interface ret:void+arg:int arg:int arg:int ret:int+arg:int arg:int arg:int arg:boolean ret:int+arg:class arg:int arg:int arg:int ret:int+arg:class arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int arg:int ret:float+arg:class arg:class ret:class+arg:class arg:class arg:boolean ret:class+arg:class arg:class arg:boolean arg:boolean ret:class+arg:class arg:class arg:float arg:float ret:void+arg:double arg:double arg:double arg:class arg:float arg:float ret:void+arg:class arg:int arg:int arg:int ret:void+arg:class arg:double arg:double arg:double arg:double arg:double arg:double ret:void+arg:class ret:boolean+arg:interface ret:void+arg:class arg:class ret:interface+arg:float ret:int+arg:class arg:float ret:class+arg:int arg:int arg:int arg:int arg:int ret:void+arg:interface ret:void+arg:class arg:boolean ret:void+arg:class ret:boolean+arg:class arg:class arg:class ret:boolean+arg:class arg:class ret:boolean+arg:class arg:double arg:double arg:double arg:float ret:class+arg:class arg:double arg:double arg:double arg:float arg:boolean ret:class+arg:class arg:class ret:float+arg:class arg:int arg:int arg:int arg:int ret:void+arg:class ret:class+arg:int arg:int arg:int arg:class ret:void+arg:class ret:void+arg:interface ret:void+arg:boolean arg:boolean ret:void+arg:int arg:int arg:int arg:int arg:int arg:int ret:int+arg:boolean ret:boolean+arg:class arg:class ret:interface+arg:interface ret:void+arg:int arg:int arg:int arg:int arg:boolean arg:int ret:boolean+arg:class arg:class arg:float ret:class+arg:class arg:int arg:int arg:int arg:float ret:class+arg:class arg:double ret:class+arg:double arg:double arg:double arg:double ret:class+arg:class ret:class+arg:int arg:int arg:int arg:int arg:int arg:int arg:class ret:void+arg:long ret:void+arg:class ret:void+arg:class arg:int arg:int arg:int ret:boolean+arg:class arg:byte ret:void+arg:class arg:class ret:void+arg:class arg:class ret:class+arg:class arg:int arg:int arg:int arg:int arg:int ret:void+arg:class arg:int arg:int arg:int arg:int arg:int arg:int ret:void+arg:int arg:int arg:int ret:void+ret:void+arg:int arg:int ret:boolean+arg:int arg:int arg:int arg:int ret:boolean+arg:float ret:float+arg:int arg:int arg:int ret:boolean+ret:void+arg:class ret:void+ret:long+arg:int arg:int arg:int ret:boolean+ret:void+arg:int arg:int arg:int ret:void+ret:interface+arg:int arg:int arg:int ret:boolean+ret:void+ret:void+ret:void+ret:interface+ret:class+arg:int arg:int arg:int ret:class+ret:boolean+ret:void+fld:int+fld:int+fld:int+fld:int+fld:int+fld:boolean+fld:interface+fld:interface+fld:class+fld:interface+fld:interface+fld:interface+fld:interface+fld:interface+fld:interface+fld:long+fld:int+fld:int+fld:int+fld:float+fld:float+fld:float+fld:float+fld:int+fld:int+fld:boolean+fld:long+fld:int+fld:int+fld:class+fld:boolean+fld:class+fld:interface+fld:interface+fld:interface+fld:class+fld:boolean+fld:boolean+fld:class+fld:class+fld:boolean+fld:boolean+fld:boolean+fld:interface+fld:int+fld:class+fld:interface+fld:boolean+fld:double+fld:double+fld:double+";
-	/*dx*/private static final String SAVE_EXTRA_CLASS_REF = "carg:long carg:int carg:boolean +ret:boolean+ret:int+ret:long+fld:long+fld:int+fld:boolean+";
-	/*nu*/private static final String BIOME_GEN_CLASS_REF = "+carg:class +arg:int arg:int ret:float+arg:class arg:int arg:int arg:int arg:int ret:class+arg:int arg:int ret:float+arg:class arg:int arg:int arg:int arg:int ret:class+ret:void+ret:interface+arg:class ret:class+arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int ret:class+arg:class arg:int arg:int arg:int arg:int arg:boolean ret:class+arg:int arg:int arg:int arg:interface ret:boolean+arg:int arg:int arg:int arg:interface arg:class ret:class+fld:class+fld:class+fld:class+fld:class+fld:class+fld:interface+fld:class+";
-	
-	// Server-Specific Signatures
-	/*cw*/ // Server save handler - client works fine
-	/*mi*/ // Server abstract save handler - client works fine
-	/*nc*/ // Biome Gen - client works fine
-	/*cp*/ // Save Class - client works fine
-	/*mn*/private static final String SERVER_RAND_CLASS_REF = "+ret:interface+ret:void+ret:void+arg:class ret:void+arg:int arg:int ret:boolean+arg:long arg:float ret:float+arg:int ret:class+fld:class+fld:class+fld:boolean+fld:boolean+fld:boolean+fld:class+fld:int+fld:class+";
-	
 	private MinecraftBiomeExtractorGUI gui = null;
 	
 	// Minecraft Class Bindings
 	private File minecraftJar = null;
-	private ArrayList<String> classListing;
-	private ArrayList<String> class_signatures;
+	private File minecraftJarCopy;
+	private URLClassLoader minecraftClassLoader;
+	private MinecraftBindings bindings;
 	private boolean useGUI = true;
-	private Class<?> saveHandlerClass;
-	private Class<?> minecraftSaveClass;
-	private Class<?> saveExtraClass;
-	private Class<?> biomeGeneratorClass;
-	private Class<?> abstractSaveHandlerClass;
-	private Class<?> serverRandomClass;
-	private Constructor<?> handleMinecraftSave;
-	private Constructor<?> createMinecraftSave;
-	private Constructor<?> createBiomeGenerator;
-    private Method genTemp;
-    private Method genMoist;
-    private Field loadedField = null;
-    private Object saveHandler;
-    private Object minecraftSave;
-    private Object biomeGeneratorObject;
-	private Object argList[]; // Used to call the biome generator.
-    
-    // Storage for the grasscolor and foliagecolor pngs
+
+	// Storage for the grasscolor and foliagecolor pngs
 	private BufferedImage grassColorImage = null;
 	private BufferedImage foliageColorImage = null;
 	private BufferedImage waterColorImage = null;
@@ -84,28 +47,25 @@ public class WorldProcessor implements Runnable
 	
 	// World Variables
 	private File worldFolder = null;
-	private ArrayList<int[]> chunks;
+	private List<int[]> chunks;
 	
 	// Output
 	private File outputDir = null;
 	
 	// Internal class state variables
 	private boolean flush = false;
-    boolean isServerJar = false;
 	private boolean errorsOnly = false;
 	private int lastPercent = 0;
 	private int countPercents = 0;
 	
 	private boolean bound = false;	// Is set to true if the extractor bound to Minecraft properly
-	private boolean die = false;  	// Set to true to abort the process if run in a separate thread.
+	private volatile boolean die = false;  	// Set to true to abort the process if run in a separate thread.
 	
 	public WorldProcessor()
 	{
 		this.useGUI = false;
 		this.errorsOnly = true;
 		
-        // Setup a parameter array we'll use to invoke minecraft's biome generator
-		setupBiomeGenArgs();
 		setupDefaultBiomeImages();
 	}
 	
@@ -119,35 +79,15 @@ public class WorldProcessor implements Runnable
 		this.flush = flush;
 		this.errorsOnly = errorsOnly;
 		
-        // Setup a parameter array we'll use to invoke minecraft's biome generator
-		setupBiomeGenArgs();
 		setupDefaultBiomeImages();
 		
 	}
 	
 	private void setupDefaultBiomeImages()
 	{
-		try
-		{
-			grassColorImage = ImageIO.read(WorldProcessor.class.getResource("/grasscolor_mbe_fallback.png"));
-			foliageColorImage = ImageIO.read(WorldProcessor.class.getResource("/foliagecolor_mbe_fallback.png"));
-			waterColorImage = ImageIO.read(WorldProcessor.class.getResource("/watercolor_mbe_fallback.png"));
-		}
-		catch (IOException e)
-		{
-			printm("Warning, could not load default biome color images." + NEW_LINE);
-		}
-	}
-	
-	private void setupBiomeGenArgs()
-	{
-        // Setup a parameter array we'll use later when invoking it
-        argList = new Object[5];
-		argList[0] = null;
-        argList[1] = Integer.valueOf(0);
-        argList[2] = Integer.valueOf(0);
-        argList[3] = Integer.valueOf(1);
-        argList[4] = Integer.valueOf(1);
+		grassColorImage = DefaultBiomeColors.create(ColourType.GrassColour);
+		foliageColorImage = DefaultBiomeColors.create(ColourType.FoliageColour);
+		waterColorImage = DefaultBiomeColors.create(ColourType.WaterColour);
 	}
 	
 	public boolean isBound()
@@ -239,7 +179,16 @@ public class WorldProcessor implements Runnable
 			
 			printm("Scanning save folder..." + NEW_LINE);
 			
-			this.setupWorldBounds(worldFolder);
+			try {
+				chunks = WorldRegionScanner.scan(worldFolder);
+			} catch (IOException e) {
+				printe("Could not scan world: " + e.getMessage() + NEW_LINE);
+				return;
+			}
+			if (chunks.isEmpty()) {
+				printm("No saved Overworld chunks found. No biome regions were generated." + NEW_LINE);
+				return;
+			}
 			printm("World Size: "+ Integer.toString(chunks.size()) + " regions" + NEW_LINE);
 			printm("Saving biome data...  (press esc to cancel)" + NEW_LINE);
 			
@@ -300,7 +249,7 @@ public class WorldProcessor implements Runnable
 					{
 						if (countPercents%10 == 0)
 							printm(NEW_LINE);
-						printm(Integer.toString(percent)+"% ... ");
+						printm(percent +"% ... ");
 						
 						lastPercent = percent;
 						countPercents++;
@@ -341,175 +290,26 @@ public class WorldProcessor implements Runnable
 			System.out.print(msg);
 	}
 	
-	public boolean loadWorld()
-	{
-		// Save Handler Arguments
-		//File paramFile, String paramString, boolean paramBoolean
-		Object handlerArgs[] = new Object[3];
-		handlerArgs[0] = worldFolder;
-		handlerArgs[1] = "";
-		handlerArgs[2] = false;
-        
-		try
-		{
-			saveHandler = handleMinecraftSave.newInstance(handlerArgs);
-		}
-		catch (IllegalArgumentException e1)
-		{
-			printe("Minecraft Save handler rejected arguments!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (InstantiationException e1)
-		{
-			printe("Minecraft Save handler failed to instantiate!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (IllegalAccessException e1)
-		{
-			printe("Minecraft Save handler missing!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (InvocationTargetException e1)
-		{
-			printe("Minecraft Save handler invocation failed!"+NEW_LINE);
-			printe("Minecraft version was incompatible."+NEW_LINE);
-			return false;
-		}
-		
-		
-		// Creating the Minecraft Save object
-		//rw paramrw, String paramString, long paramLong)
-		Object saveArgs[] = new Object[3];
-        saveArgs[0] = saveHandler;
-        saveArgs[1] = "";
-        saveArgs[2] = null;
-        
-		Object saveArgs2[] = new Object[4];
-        saveArgs2[0] = saveHandler;
-        saveArgs2[1] = "";
-        saveArgs2[2] = null;
-        saveArgs2[3] = null;
-      
-		try
-		{
-			if (isServerJar)
-				minecraftSave = createMinecraftSave.newInstance(saveArgs2);
-			else
-				minecraftSave = createMinecraftSave.newInstance(saveArgs);
-		}
-		catch (IllegalArgumentException e1)
-		{
-			printe("Minecraft Save object rejected arguments!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (InstantiationException e1)
-		{
-			printe("Minecraft Save object failed to instantiate!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (IllegalAccessException e1)
-		{
-			printe("Minecraft Save object missing!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (InvocationTargetException e1)
-		{
-			printe("Minecraft Save object invocation failed!"+NEW_LINE);
-			printe("Minecraft version was incompatible."+NEW_LINE);
-			return false;
-		}
-		
-		if (loadedField != null)
-		{
-			try
-			{
-				if (!loadedField.getBoolean(minecraftSave))
-				{
-					printm("Level Loaded!"+NEW_LINE);
-				}
-				else
-				{
-					printe("Level failed to load!"+NEW_LINE);
-					return false;
-				}
-			}
-			catch (IllegalArgumentException e2)
-			{
-				printe("Couldn't check if save loaded."+NEW_LINE);
-				printm("Things might not work."+NEW_LINE);
-			}
-			catch (IllegalAccessException e2)
-			{
-				printe("Couldn't check if save loaded."+NEW_LINE);
-				printm("Things might not work."+NEW_LINE);
-			}
-		}
-	
-		// Creating the Biome Generator using the minecraft save object
-		Object bioGenArgs[] = new Object[1];
-		bioGenArgs[0] = minecraftSave;
-		try
-		{
-			biomeGeneratorObject = createBiomeGenerator.newInstance(bioGenArgs);
-		}
-		catch (IllegalArgumentException e1)
-		{
-			printe("BiomeGen constructor rejected arguments!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (InstantiationException e1)
-		{
-			printe("BiomeGen object failed to instantiate!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (IllegalAccessException e1)
-		{
-			printe("BiomeGen object missing!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		catch (InvocationTargetException e1)
-		{
-			printe("BiomeGen object invocation failed!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		return true;
+	/** Returns the selected API profile, or null when no JAR is bound. */
+	public String getBindingProfileName() {
+		return bindings == null ? null : bindings.profile.displayName;
 	}
 
-	// Setup the chunks for the currently selected world
-	private void setupWorldBounds(File worldFolder)
-	{
-		chunks = new ArrayList<int[]>();
-		String[] parts;
-		File regionFolder = new File(worldFolder,"region");
-		if (regionFolder.isDirectory())
-		{
-			File[] potentialChunks = regionFolder.listFiles();
-			for(int i=0;i<potentialChunks.length;i++)
-			{
-				parts = potentialChunks[i].getName().split("\\.");
-				if (parts.length==4 && parts[0].equals("r") && parts[3].equals("mcr"))
-				{
-					int[] mcrChunk = new int[2];
-					mcrChunk[0] = Integer.parseInt(parts[1]);
-					mcrChunk[1] = Integer.parseInt(parts[2]);
-					chunks.add(mcrChunk);
-				}
-			}
+	public boolean loadWorld() {
+		if (bindings == null || worldFolder == null) {
+			printe("Bind a Minecraft JAR and select a world before loading." + NEW_LINE);
+			return false;
+		}
+		try {
+			bindings.loadWorld(worldFolder);
+			printm("Level Loaded!" + NEW_LINE);
+			return true;
+		} catch (ReflectiveOperationException | RuntimeException e) {
+			printe("Could not load world using " + bindings.profile.displayName + ": " + e + NEW_LINE);
+			return false;
 		}
 	}
-	
-    
-    
+
     // If no EXTRACTEDBIOMES folder exists, make one.
     // Copy in grasscolor.png, foliagecolor.png, and watercolor.png
     private void setupDataFolder(final File biomesFolder)
@@ -545,155 +345,34 @@ public class WorldProcessor implements Runnable
 		}
     }
     
-    // Given a signature that came out of generateSignatures at some point in the past
-    // find the best match of the classes loaded from the minecraft.jar.
-    private int matchClassSignature(String signature)
-    {
-    	String[] sig_components=null;
-    	String[] ref_components=null;
-    	int peak_matches = 1;
-    	int peak_index = -1;
-    	int i;
-    	for (i = 0; i<class_signatures.size();i++)
-    	{
-    		int matches = 0;
-    		int antimatches = 0;
-    		sig_components = class_signatures.get(i).split("\\+");
-    		ref_components = signature.split("\\+");
-    		
-    		for (int j=0;j<ref_components.length;j++)
-    		{
-    			for (int k=0;k<sig_components.length;k++)
-    			{
-    				if (ref_components[j].equalsIgnoreCase(sig_components[k]))
-    				{
-    					sig_components[k]="";
-    					matches++;
-    					break;
-    				}
-    			}
-    		}
-    		
-    		sig_components = class_signatures.get(i).split("\\+");
-    		
-    		boolean matched;
-    		for (int j=0;j<sig_components.length;j++)
-    		{
-    			matched = false;
-    			for (int k=0;k<ref_components.length;k++)
-    			{
-    				if (ref_components[k].equalsIgnoreCase(sig_components[j]))
-    				{
-    					ref_components[k] = "";
-    					matched = true;
-    					break;
-    				}
-    			}
-    			if (!matched)
-    				antimatches++;
-    		}
-    		
-			if ((matches-antimatches) > peak_matches)
-			{
-				peak_matches = matches-antimatches;
-				peak_index = i;
-			}
-    	}
-    	Long ms = Math.round(100.0*(float)peak_matches/(float)ref_components.length);
-    	printm("Match strength: " + ms.toString() + "%\t");
-		
-    	return peak_index;
-    }
-    
-	  
-	/*
-	 * The manual API
-	 */
-	public float[] getTemperaturesAtBlocks(float[] dest, final int x, final int z, final int dx, final int dz) throws Exception // Returns a block of temperatures (float)
-	{
-		try
-		{
-			argList[0] = dest;
-			argList[1] = x;
-			argList[2] = z;
-			argList[3] = dx;
-			argList[4] = dz;
-			
-			return (float[])(genTemp.invoke(biomeGeneratorObject, argList));
-		}
-		catch (Throwable e)
-		{
-			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getTemperaturesAtBlock)"));
-		}
+	public float[] getTemperaturesAtBlocks(float[] dest, int x, int z, int dx, int dz) throws Exception {
+		return requireBindings().climate(true, dest, x, z, dx, dz);
 	}
-	
-	  public double getTemperatureAtBlock(final int x, final int z) throws Exception // Returns the temperature (double)
-	  {
-		  float[] temps = getTemperaturesAtBlocks(null, x, z, 1, 1);
-		  return (double)(temps[0]);
-	  }
-	  
-	public float[] getMoisturesAtBlocks(float[] dest, final int x, final int z, final int dx, final int dz) throws Exception // Returns a block of moistures (double)
-	{
-		try
-		{
-			argList[0] = dest;
-			argList[1] = x;
-			argList[2] = z;
-			argList[3] = dx;
-			argList[4] = dz;
-			
-			return (float[])(genMoist.invoke(biomeGeneratorObject, argList));
-		}
-		catch (Throwable e)
-		{
-			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getMoisturesAtBlocks)"));
-		}
-	}
-	
-	  public double getMoistureAtBlock(final int x, final int z) throws Exception // Returns the moisture (double)
-	  {
-		  float[] moists = getMoisturesAtBlocks(null, x, z, 1, 1);
-		  return (double)(moists[0]);
-	  }
-	
-	public ByteCoord[] getCoordsAtBlocks(ByteCoord[] dest, float[] temps, float[] moists, final int x, final int z, final int dx, final int dz) throws Exception // Returns the location of a whole set of blocks, efficiently
-	{
-		if (biomeGeneratorObject == null)
-			throw new NullPointerException("BiomeGenerator is null!");
-		
-		if (dest == null || dest.length != dx * dz)
-			dest = new ByteCoord[dx * dz];
-		
-		try
-		{
-			temps = getTemperaturesAtBlocks(temps, x, z, dx, dz);
-			moists = getMoisturesAtBlocks(moists, x, z, dx, dz);
-			
-			for (int i = 0; i < dx * dz; i++)
-			{
-				byte coordx = (byte) ((1.0 - temps[i]) * 255.0);
-				byte coordy = (byte) ((1.0 - (moists[i] * temps[i])) * 255.0);
 
-				if (dest[i] == null)
-				{
-					dest[i] = new ByteCoord(coordx, coordy);
-				} else {
-					dest[i].x = coordx;
-					dest[i].y = coordy;
-				}
-			}
-			
-			return dest;
+	public double getTemperatureAtBlock(int x, int z) throws Exception {
+		return requireBindings().climateAtBlock(true, x, z);
+	}
+
+	public float[] getMoisturesAtBlocks(float[] dest, int x, int z, int dx, int dz) throws Exception {
+		return requireBindings().climate(false, dest, x, z, dx, dz);
+	}
+
+	public double getMoistureAtBlock(int x, int z) throws Exception {
+		return requireBindings().climateAtBlock(false, x, z);
+	}
+
+	public ByteCoord[] getCoordsAtBlocks(ByteCoord[] dest, float[] temps, float[] moists, int x, int z, int dx, int dz)
+			throws Exception {
+		return requireBindings().coordinates(dest, temps, moists, x, z, dx, dz);
+	}
+
+	private MinecraftBindings requireBindings() {
+		if (bindings == null) {
+			throw new IllegalStateException("Bind a Minecraft JAR before requesting biome data");
 		}
-		catch (Throwable e)
-		{
-			printe("Details:" + e.getMessage());
-			e.printStackTrace();
-			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getCoordsAtBlocks)"));
-		}
-	}			
-	
+		return bindings;
+	}
+
 	public byte[] getCoordsAtBlock(final int x, final int z) throws Exception // Returns the location of the biome color in the 256x256 biome PNG (two bytes)
 	{
 		ByteCoord[] coords = getCoordsAtBlocks(null, null, null, x, z, 1, 1);
@@ -782,6 +461,46 @@ public class WorldProcessor implements Runnable
 	
 	public boolean bindToMinecraft()
 	{
+		try {
+			close();
+		} catch (IOException e) {
+			printe("Could not release the previous Minecraft JAR: " + e.getMessage() + NEW_LINE);
+			return false;
+		}
+		try {
+			return bindMinecraft();
+		} finally {
+			if (!bound) {
+				try {
+					close();
+				} catch (IOException e) {
+					printe("Could not release the Minecraft JAR: " + e.getMessage() + NEW_LINE);
+				}
+			}
+		}
+	}
+
+	/** Releases this processor's class loader and temporary JAR. Do not call while extracting. */
+	@Override
+	public void close() throws IOException {
+		bound = false;
+		bindings = null;
+		URLClassLoader loader = minecraftClassLoader;
+		minecraftClassLoader = null;
+		try {
+			if (loader != null) {
+				loader.close();
+			}
+		} finally {
+			if (minecraftJarCopy != null) {
+				Files.deleteIfExists(minecraftJarCopy.toPath());
+				minecraftJarCopy = null;
+			}
+		}
+	}
+
+	private boolean bindMinecraft()
+	{
 		// This method kind of crazy. 
 		// 1.) Find the minecraft.jar
 		// 2.) Check for MOJANG signatures
@@ -789,7 +508,7 @@ public class WorldProcessor implements Runnable
 		// 3.) Take a note of all files ending in .class
 		// 4.) Copy grasscolor, foliagecolor and watercolor to memory.
 		// 5.) Close the zip file
-		// 6.) Add minecraft.jar to the classpath
+		// 6.) Open an independent class loader for the Minecraft JAR
 		// 7.) Scan through and match the save class and biome classes
 		//		based on signatures
 		// 8.) Bind the classes and functions we need to reflection variables
@@ -802,446 +521,96 @@ public class WorldProcessor implements Runnable
 		}
 		
 		// Check minecraft jar looks valid
-		if (minecraftJar == null || !minecraftJar.exists())
+		if (minecraftJar == null || !minecraftJar.isFile())
 		{
 			printe("Failed to locate minecraft.jar"+NEW_LINE);
-			printe("Path: " + minecraftJar.getAbsolutePath() +NEW_LINE);
+			printe("Path: " + minecraftJar + NEW_LINE);
 			printe("Minecraft doesn't appear to be installed!"+NEW_LINE);
 
 			return false;
 		}
 		
-		classListing = new ArrayList<String>();
-		try
-		{
-			// Take a copy of the jar to work on and strip out the signature while we're at it
-			File newMinecraftJar = new File(minecraftJar.getParentFile(), minecraftJar.getName()+".new");
-			stripMinecraftJar(minecraftJar, newMinecraftJar);
-			minecraftJar = newMinecraftJar;
-			
-			// Now we've got a copy we can go to work on it
-			
-			ZipFile mcjar = new ZipFile(minecraftJar);
-			
-			// Copy grasscolor.png, foliagecolor.png and watercolor.png
-			ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
-			ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
-			ZipEntry watercolor = mcjar.getEntry("misc/watercolor.png");
-			
-			// TODO: This doesn't close the input streams properly
-
-			// Only try to grab the biome color images from minecraft if they exist in the JAR
-			// and they are not already loaded (from the setBiomeImages method, for example).
-			if (grasscolor != null && useDefaultBiomeImages)
-			{
-				grassColorImage = ImageIO.read(mcjar.getInputStream(grasscolor));
-			}
-			if (foliagecolor != null && useDefaultBiomeImages)
-			{
-				foliageColorImage = ImageIO.read(mcjar.getInputStream(foliagecolor));
-			}
-			if (watercolor != null && useDefaultBiomeImages)
-			{
-				waterColorImage = ImageIO.read(mcjar.getInputStream(watercolor));
-			}
-			
-			
-			// Scan the jar file and gather a class listing
-			
-			Enumeration<? extends ZipEntry> e = mcjar.entries();
-			while (e.hasMoreElements())
-			{
-				ZipEntry currentFile = e.nextElement();
-				String[] components = currentFile.getName().split("/");
-				String fileName = components[components.length-1];
-				
-				if (fileName.toLowerCase().endsWith(".class") && currentFile.getName().length() > 5)
-				{
-					String className = fileName.substring(0, fileName.length()-6);
-					classListing.add(className);
-				}
-			}
-			
-			mcjar.close();
-			
-		}
-		catch (IOException e1)
-		{
-			e1.printStackTrace();
-            printe("Failed to open new jar for writing!"+NEW_LINE);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			printe("Exception while trying to open jar file"+NEW_LINE);
-		}
-	
-		
-		try
-		{
-			ClasspathUtil.addJarToClasspath(minecraftJar);
-		}
-		catch (IOException e)
-		{
-			printe("I can't seem to find your minecraft jar file!"+NEW_LINE);
-		}
-		
-		// The classes, methods, and fields we need, as strings:
-		// Classes
-		String abstract_save_handler_class = "acq";
-		String abstract_save_handler_class_signature = ABSTRACT_SAVE_HANDLER_REF;
-		
-		String save_handler_class = "dd";
-		String save_handler_class_signature = SAVE_HANDLER_CLASS_REF;
-		
-		String save_class = "rv";
-		String save_class_signature = SAVE_CLASS_REF;
-		
-		String save_extra_class = "dx";
-		String save_extra_class_signature = SAVE_EXTRA_CLASS_REF;
-		
-		String biome_gen_class = "nu";
-		String biome_gen_class_signature = BIOME_GEN_CLASS_REF;
-		
-		// Methods
-		// This is unlikely to change so I don't need to detect it.
-		String biome_generator_temp = "a";
-		String biome_generator_moist = "b";
-		
-		//Fields
-		// Typically the not loaded flag is the 3rd boolean in the save class
-		String save_notloaded = "q";
-		String save_notloaded_type = "boolean";
-		int save_notloaded_count = 3;
-		
-		class_signatures = new ArrayList<String>();
-		
-		for (int i = 0; i<classListing.size();i++)
-		{
-			class_signatures.add(ReflectionUtil.generateClassSignature(classListing.get(i)));
-			
-			// Dump all the class signatures - helpful!
-			if(printClassRefStrings)
-			{
-				System.out.println(classListing.get(i));
-				System.out.println(ReflectionUtil.generateClassSignature(classListing.get(i)));
-				System.out.println("\n");
-			}
-		}
-		
-		int class_id = this.matchClassSignature(abstract_save_handler_class_signature);
-		if (class_id != -1)
-		{
-			abstract_save_handler_class = classListing.get(class_id);
-			printm("Handler interface is: "+abstract_save_handler_class+NEW_LINE);
-			if (printClassRefStrings)
-				printm(class_signatures.get(class_id)+NEW_LINE);
-		}
-		else
-		{
-			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
-			printe("Signature match for handler class not found."+NEW_LINE);
-			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
-			
-			for (int i=0; i<classListing.size(); i++)
-			{
-				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
-			}
-			return false;
-		}
-		
-		class_id = this.matchClassSignature(save_handler_class_signature);
-		if (class_id != -1)
-		{
-			save_handler_class = classListing.get(class_id);
-			printm("Handler class is: "+save_handler_class+NEW_LINE);
-			if (printClassRefStrings)
-				printm(class_signatures.get(class_id)+NEW_LINE);
-		}
-		else
-		{
-			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
-			printe("Signature match for save class not found."+NEW_LINE);
-			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
-			
-			for (int i=0; i<classListing.size(); i++)
-			{
-				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
-			}
-			return false;
-		}
-		
-		
-		class_id = this.matchClassSignature(save_class_signature);
-		if (class_id != -1)
-		{
-			save_class = classListing.get(class_id);
-			printm("Save class is: "+save_class+NEW_LINE);
-			if (printClassRefStrings)
-				printm(class_signatures.get(class_id)+NEW_LINE);
-		}
-		else
-		{
-			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
-			printe("Signature match for save class not found."+NEW_LINE);
-			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
-			
-			for (int i=0; i<classListing.size(); i++)
-			{
-				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
-			}
-			return false;
-		}
-
-		class_id = this.matchClassSignature(save_extra_class_signature);
-		if (class_id != -1)
-		{
-			save_extra_class = classListing.get(class_id);
-			printm("Save-extra class is: "+save_extra_class+NEW_LINE);
-			if (printClassRefStrings)
-				printm(class_signatures.get(class_id)+NEW_LINE);
-		}
-		else
-		{
-			printe(NEW_LINE + "Deobfuscation of minecraft.jar failed."+NEW_LINE);
-			printe("Signature match for save-extra class not found."+NEW_LINE);
-			printe("Class listing ("+ Integer.toString(classListing.size()) + "entires)" + NEW_LINE);
-			
-			for (int i=0; i<classListing.size(); i++)
-			{
-				printe("\t"+ classListing.get(i) + ".class" + NEW_LINE);
-			}
-			return false;
-		}
-		
-		class_id = this.matchClassSignature(biome_gen_class_signature);
-		if (class_id != -1)
-		{
-			biome_gen_class = classListing.get(class_id);
-			printm("Biome Gen class is: "+biome_gen_class+NEW_LINE);
-			if (printClassRefStrings)
-				printm(class_signatures.get(class_id)+NEW_LINE);
-		}
-		else
-		{
-			printe("Deobfuscation of minecraft.jar failed."+NEW_LINE);
-			printe("Signature match for biome gen class not found."+NEW_LINE);
-			return false;
-		}
-	
-		// Get the classes we need using reflection
-		
-		try
-		{
-			saveHandlerClass = Class.forName(save_handler_class);
-			minecraftSaveClass = Class.forName(save_class);
-			saveExtraClass = Class.forName(save_extra_class);
-			biomeGeneratorClass = Class.forName(biome_gen_class);
-			abstractSaveHandlerClass = Class.forName(abstract_save_handler_class);
-		}
-		catch (ClassNotFoundException e2)
-		{
-			printe("Can't find Minecraft! Looked here:"+NEW_LINE);
-			printe(minecraftJar.getAbsolutePath()+NEW_LINE);
-			printe("Make certain minecraft.jar is in that location."+NEW_LINE);
-			return false;
-		}
-		
-		Class<?> partypes[] = new Class[3];
-        partypes[0] = File.class;
-        partypes[1] = String.class;
-        partypes[2] = Boolean.TYPE;
-        
-		try
-		{
-			handleMinecraftSave = saveHandlerClass.getConstructor(partypes);
-		}
-		catch (SecurityException e1)
-		{
-			printe("Could not bind MinecraftSaveHandler Constructor (security issue)"+NEW_LINE);
-			printe("I'm trying to delete the Mojang signatures for you."+NEW_LINE);
-			printe("Restart the program and try again."+NEW_LINE);
-			return false;
-		}
-		catch (NoSuchMethodException e1)
-		{
-			// Save handler failed to bind
-			printe("Could not bind MinecraftSaveHandler Constructor."+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		
-		
-		// Setup the MINECRAFTSAVECLASS constructor
-		// Client
-		partypes = new Class[3];
-        partypes[0] = abstractSaveHandlerClass;
-        partypes[1] = String.class;
-        partypes[2] = saveExtraClass;
-        
-		try
-		{
-			createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
-		}
-		catch (SecurityException e1)
-		{
-			printe("Could not bind MinecraftSave Constructor (security issue)"+NEW_LINE);
-			printe("I'm trying to delete the Mojang signatures for you."+NEW_LINE);
-			printe("Restart the program and try again."+NEW_LINE);
-			return false;
-		}
-		catch (NoSuchMethodException e1)
-		{
-			// This could mean that you are operating on a server JAR. Try this:
-			try
-			{
-				printm("Server software detected."+NEW_LINE);
-				String server_random_class_name = classListing.get(this.matchClassSignature(SERVER_RAND_CLASS_REF));
-				printm("Server random class is: " + server_random_class_name + NEW_LINE);
-				serverRandomClass = Class.forName(server_random_class_name);
-				
-				// Server constructors look like this:
-				//   public cp(mi parammi, String paramString, long paramLong, mn parammn)
-				
-				partypes = new Class[4];
-		        partypes[0] = abstractSaveHandlerClass;
-		        partypes[1] = String.class;
-		        partypes[2] = saveExtraClass;
-				partypes[3] = serverRandomClass;
-				createMinecraftSave = minecraftSaveClass.getConstructor(partypes);
-				isServerJar = true;
-				
-				if (printClassRefStrings)
-					printm(class_signatures.get(this.matchClassSignature(SERVER_RAND_CLASS_REF))+NEW_LINE);
-			}
-			catch (Throwable e)
-			{
-				printe("Could not bind MinecraftSave Constructor for servers."+NEW_LINE);
-				printe("Minecraft version was incompatible"+NEW_LINE);
-				return false;
-			}
-		}
-		
-        // Setup the BIOMEGENERATORCLASS constructor
-		partypes = new Class[1];
-        partypes[0] = minecraftSaveClass;
-        try {
-			createBiomeGenerator = biomeGeneratorClass.getConstructor(partypes);
-		} catch (SecurityException e1) {
-			printe("Could not bind BiomeGenerator Constructor (security issue)"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		} catch (NoSuchMethodException e1) {
-			printe("Could not bind BiomeGenerator Constructor"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		
-		// Setup the save class loaded field
-		save_notloaded = ReflectionUtil.getFieldWithType(save_class, save_notloaded_type, save_notloaded_count);
-
-		try
-		{
-			loadedField = minecraftSaveClass.getField(save_notloaded);
-		}
-		catch (SecurityException e2)
-		{
-			printe("Couldn't check if save loaded."+NEW_LINE);
-			printm("Trying anyway..."+NEW_LINE);
-		}
-		catch (NoSuchFieldException e2)
-		{
-			printe("Couldn't check if save loaded."+NEW_LINE);
-			printm("Trying anyway..."+NEW_LINE);
-		}
-		
-		// Binding the method that generates the biomes
-        // Setup the parameters the methods takes
-        partypes = new Class[5];
-		partypes[0] = float[].class;
-        partypes[1] = Integer.TYPE;
-        partypes[2] = Integer.TYPE;
-        partypes[3] = Integer.TYPE;
-        partypes[4] = Integer.TYPE;
-        
-        // Create the method object
+		ArrayList<String> classListing = new ArrayList<String>();
 		try {
-			genTemp = biomeGeneratorClass.getMethod(biome_generator_temp, partypes);
-			genMoist = biomeGeneratorClass.getMethod(biome_generator_moist, partypes);
-		} catch (SecurityException e1) {
-			printe("Failed to setup biogen method!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		} catch (NoSuchMethodException e1) {
-			printe("Failed to setup biogen method!"+NEW_LINE);
-			printe("Minecraft version was incompatible"+NEW_LINE);
-			return false;
-		}
-		
-		printm("Ready!"+NEW_LINE+NEW_LINE);
-		
-		bound = true;
-		return true;
-	}
-	
-	private static void stripMinecraftJar(File srcJar, File destJar) throws Exception
-	{
-		// Copy the jar and strip out the signature while we're at it
-		
-		FileOutputStream dest = null;
-		ZipOutputStream zout = null;
-		
-		try
-		{
-			byte data[] = new byte[1024 * 2];
-			
-			dest = new FileOutputStream(destJar);
-			zout = new ZipOutputStream(new BufferedOutputStream(dest));
-			
-			ZipFile mcjar = new ZipFile(srcJar);
-			Enumeration<? extends ZipEntry> e = mcjar.entries();
-			while(e.hasMoreElements())
-			{
-				ZipEntry currentfile = (ZipEntry)e.nextElement();
-	
-				// Only copy files which don't end in .dsa or .sf
-				if ( !(currentfile.getName().endsWith(".DSA") || currentfile.getName().endsWith(".SF")) )
-				{
-					InputStream in = mcjar.getInputStream(currentfile);
-					BufferedInputStream is = new BufferedInputStream(in);
-					
-					ZipEntry destEntry = new ZipEntry (currentfile.getName());
-					zout.putNextEntry(destEntry);
-					
-					int count = 0;
-		            while((count = is.read(data, 0, data.length)) != -1)
-		            {
-		               zout.write(data, 0, count);
-		            }
-		            is.close();
+			// Use an owned temporary copy so input JARs remain untouched and processors do not share files.
+			minecraftJarCopy = Files.createTempFile("biomeextractor-", ".jar").toFile();
+			stripMinecraftJar(minecraftJar, minecraftJarCopy);
+			try (ZipFile mcjar = new ZipFile(minecraftJarCopy)) {
+				if (useDefaultBiomeImages) {
+					setupDefaultBiomeImages();
+					ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
+					ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
+					ZipEntry watercolor = mcjar.getEntry("misc/watercolor.png");
+					if (grasscolor != null) {
+						try (InputStream input = mcjar.getInputStream(grasscolor)) {
+							grassColorImage = ImageIO.read(input);
+						}
+					}
+					if (foliagecolor != null) {
+						try (InputStream input = mcjar.getInputStream(foliagecolor)) {
+							foliageColorImage = ImageIO.read(input);
+						}
+					}
+					if (watercolor != null) {
+						try (InputStream input = mcjar.getInputStream(watercolor)) {
+							waterColorImage = ImageIO.read(input);
+						}
+					}
 				}
-				else
-				{
-					System.out.println("Skipping "+currentfile.getName());
+				Enumeration<? extends ZipEntry> entries = mcjar.entries();
+				while (entries.hasMoreElements()) {
+					String name = entries.nextElement().getName();
+					if (name.endsWith(".class") && name.length() > 6) {
+						classListing.add(name.substring(0, name.length() - 6).replace('/', '.'));
+					}
 				}
 			}
+			minecraftClassLoader = ClasspathUtil.createClassLoader(minecraftJarCopy);
+		} catch (IOException e) {
+			printe("Could not open Minecraft JAR: " + e.getMessage() + NEW_LINE);
+			return false;
 		}
-		finally
-		{
-			try
-			{
-				if (zout != null)
-					zout.close();
+
+		Map<String, String> signatures = new LinkedHashMap<>();
+		for (String className : classListing) {
+			signatures.put(className, ReflectionUtil.generateClassSignature(className, minecraftClassLoader));
+		}
+		for (BindingProfile profile : BindingProfile.values()) {
+			try {
+				MinecraftBindings candidate = new MinecraftBindings(profile, minecraftClassLoader, signatures);
+				bindings = candidate;
+				bound = true;
+				printm("Ready! Using " + profile.displayName + (candidate.server ? " server" : " client") + " bindings." + NEW_LINE);
+				return true;
+			} catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
+				printm(profile.displayName + " bindings did not match: " + e.getMessage() + NEW_LINE);
 			}
-			catch (Exception e) {}
-			try
-			{
-				if (dest != null)
-					dest.close();
-			}
-			catch (Exception e) {}
+		}
+		printe("No compatible Minecraft binding profile matched this JAR." + NEW_LINE);
+		return false;
+	}
+
+	private static void stripMinecraftJar(File srcJar, File destJar) throws IOException {
+		try (ZipFile source = new ZipFile(srcJar);
+				ZipOutputStream output = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destJar)))) {
+			byte[] buffer = new byte[8192];
+			Enumeration<? extends ZipEntry> entries = source.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry entry = entries.nextElement();
+				String name = entry.getName().toUpperCase(java.util.Locale.ROOT);
+				if (name.startsWith("META-INF/") && (name.endsWith(".DSA") || name.endsWith(".SF")
+						|| name.endsWith(".RSA") || name.endsWith(".EC"))) {
+					continue;
+				}
+				output.putNextEntry(new ZipEntry(entry.getName()));
+				try (InputStream input = source.getInputStream(entry)) {
+					int count;
+					while ((count = input.read(buffer)) != -1) {
+						output.write(buffer, 0, count);
+					}
+				}
+				output.closeEntry();
 		}
 	}
-	
-	// END CLASS DEF
+}
 }

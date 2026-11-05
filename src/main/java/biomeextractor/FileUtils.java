@@ -1,4 +1,4 @@
-package com.google.code.minecraftbiomeextractor;
+package biomeextractor;
 
 import java.io.BufferedInputStream;
 import java.io.File;

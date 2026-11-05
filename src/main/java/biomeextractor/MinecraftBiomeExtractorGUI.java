@@ -1,4 +1,4 @@
-package com.google.code.minecraftbiomeextractor;
+package biomeextractor;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -206,10 +207,38 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 	{
 		//Create and set up the window.
 		JFrame frame = new JFrame("Minecraft Biome Extractor");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	
 		//Add content to the window.
-		frame.add(new MinecraftBiomeExtractorGUI(jarLocation));
+		final MinecraftBiomeExtractorGUI panel = new MinecraftBiomeExtractorGUI(jarLocation);
+		frame.add(panel);
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+			private boolean closing;
+
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent event) {
+				if (closing) {
+					return;
+				}
+				closing = true;
+				frame.setEnabled(false);
+				panel.world_processor.stopRunning();
+				new Thread(() -> {
+					try {
+						if (panel.process_thread != null) {
+							panel.process_thread.join();
+						}
+						panel.world_processor.close();
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					} catch (IOException e) {
+						System.err.println("Could not release the Minecraft JAR: " + e.getMessage());
+					} finally {
+						System.exit(0);
+					}
+				}, "biomeextractor-shutdown").start();
+			}
+		});
 	
 		//Display the window.
 		frame.pack();

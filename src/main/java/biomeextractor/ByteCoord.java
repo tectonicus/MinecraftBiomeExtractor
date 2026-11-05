@@ -1,4 +1,4 @@
-package com.google.code.minecraftbiomeextractor;
+package biomeextractor;
 
 public class ByteCoord
 {

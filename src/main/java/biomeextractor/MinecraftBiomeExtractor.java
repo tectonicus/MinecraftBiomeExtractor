@@ -1,4 +1,4 @@
-package com.google.code.minecraftbiomeextractor;
+package biomeextractor;
 
 import java.io.File;
 
@@ -90,29 +90,26 @@ public class MinecraftBiomeExtractor
 			if (worldFolder.isDirectory())
 			{
 				// Create a world processor and bind to minecraft
-				WorldProcessor worldProcessor = new WorldProcessor(null, errorsOnly, flush);
-				
-				if (manualJarLocation)
-					worldProcessor.setJarLocation(jarLocation);
-				
-				final boolean bound = worldProcessor.bindToMinecraft();
-				if (!bound)
-				{
-					System.out.print("Failed to bind to Minecraft, cannot generate biomes.\n" 
-							 + "Review the above messages to see if there's anything you can do about it.\n"
-							 + "If not, check online for a new version.");
-				}
-				else
-				{
+				try (WorldProcessor worldProcessor = new WorldProcessor(null, errorsOnly, flush)) {
+					if (manualJarLocation) {
+						worldProcessor.setJarLocation(jarLocation);
+					}
+					if (!worldProcessor.bindToMinecraft()) {
+						System.out.print("Failed to bind to Minecraft, cannot generate biomes.\n"
+								+ "Review the above messages to see if there's anything you can do about it.\n"
+								+ "If not, check online for a new version.");
+						return;
+					}
 					worldProcessor.setWorldFolder(worldFolder);
 					worldProcessor.setOutputDir(outputDir);
 					worldProcessor.run();
-					
-					// for some reason (on 1.9pre) java will hang FOREVER at the
-					// end of this function unless this call is here
-					// (this is a hack, though)
-					System.exit(0);
+				} catch (java.io.IOException e) {
+					System.err.println("Could not release the Minecraft JAR: " + e.getMessage());
+					return;
 				}
+				// Some historical client versions leave threads running after extraction.
+				// Close the processor before exiting so its temporary JAR is removed.
+				System.exit(0);
 			}
 			else
 			{

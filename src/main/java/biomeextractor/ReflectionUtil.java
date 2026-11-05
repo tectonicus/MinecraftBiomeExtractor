@@ -1,4 +1,4 @@
-package com.google.code.minecraftbiomeextractor;
+package biomeextractor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -12,10 +12,15 @@ public class ReflectionUtil
 	// any names.
 	public static String generateClassSignature(final String className)
 	{
+		return generateClassSignature(className, ReflectionUtil.class.getClassLoader());
+	}
+
+	public static String generateClassSignature(final String className, ClassLoader classLoader)
+	{
 		String signature = "";
 		try
 		{
-			Class<?> clazz = Class.forName(className);
+			Class<?> clazz = Class.forName(className, false, classLoader);
 			
 			Constructor<?> ctorList[] = clazz.getDeclaredConstructors();
 			for (int i = 0; i < ctorList.length; i++)
@@ -80,11 +85,16 @@ public class ReflectionUtil
 	// fcount-th field with that type.
 	public static String getFieldWithType(final String className, final String tpe, final int fcount)
 	{
+		return getFieldWithType(className, tpe, fcount, ReflectionUtil.class.getClassLoader());
+	}
+
+	public static String getFieldWithType(final String className, final String tpe, final int fcount, ClassLoader classLoader)
+	{
 		try
 		{
 			int count = 0;
 			
-			Class<?> clazz = Class.forName(className);
+			Class<?> clazz = Class.forName(className, false, classLoader);
 		//	Field fieldlist[] = clazz.getDeclaredFields();
 		//	for (int i = 0; i < fieldlist.length; i++)
 			for (Field fld : clazz.getDeclaredFields())
