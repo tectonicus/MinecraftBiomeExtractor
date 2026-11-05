@@ -1,0 +1,17 @@
+/.gradle/
+/build/
+/Dist/
+/bin/
+/out/
+/.idea/
+/.settings/
+/.classpath
+/.project
+*.iml
+*.log
+
+# Minecraft binaries and extracted textures are local integration inputs only.
+*.jar
+*.jar.new
+!/gradle/wrapper/gradle-wrapper.jar
+/testdata/**/*.png
