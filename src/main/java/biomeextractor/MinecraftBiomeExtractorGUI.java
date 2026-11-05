@@ -98,7 +98,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		// Create our escape key listener
 		log.addKeyListener( new KeyHandler() );
 		
-		log.append("Minecraft Biome Extractor (v0.9.0)"+newline+newline);
+		log.append("Minecraft Biome Extractor (v1.1.0)"+newline+newline);
 		
 		log.repaint();
 		
@@ -115,8 +115,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		else
 		{
 			message("Failed to bind to Minecraft, cannot generate biomes." +newline 
-					 + "Review the above messages to see if there's anything you can do about it." +newline
-					 + "If not, check online for a new version."+newline);
+					 + "Review the above messages to see if there's anything you can do about it." +newline);
 		}
 		
 	}

@@ -2,22 +2,26 @@
 
 Extract biome colormap coordinates from historical Minecraft worlds through a Java API, CLI, or Swing interface. Requires **Java 21+**; builds use JDK 21.
 
+Developed for early Minecraft mapping tools, the extractor reconstructs biome-dependent grass and foliage colors for worlds created before Minecraft stored biome IDs in chunks. It runs the matching Minecraft JAR's generator using the world seed, producing per-block colormap coordinates. Mapping tools use those coordinates with the client colormaps to color their rendered maps. Standalone exports are `.biome` files and PNGs; applications can also query coordinates directly through the Java API.
+
+Historical users included **mcmap**, **MCMap Live**, **Minemapper**, **Minecraft Overviewer** and **Tectonicus**.
+
 ## Build
 
 ```powershell
 .\gradlew.bat build
 ```
 
-Use `./gradlew` on macOS/Linux. The executable JAR is `build/libs/BiomeExtractor-1.0.jar`; a sources JAR is also produced.
+Use `./gradlew` on macOS/Linux. The executable JAR is `build/libs/BiomeExtractor-1.1.0.jar`; a sources JAR is also produced.
 
 ## Usage
 
 ```powershell
 # Export coordinates and available real colormaps
-java -jar build/libs/BiomeExtractor-1.0.jar -nogui path/to/world -jar path/to/client.jar
+java -jar build/libs/BiomeExtractor-1.1.0.jar -nogui path/to/world -jar path/to/client.jar
 
 # Export coordinates only, including with supported server JARs
-java -jar build/libs/BiomeExtractor-1.0.jar -nogui path/to/world -jar path/to/server.jar -coordsOnly
+java -jar build/libs/BiomeExtractor-1.1.0.jar -nogui path/to/world -jar path/to/server.jar -coordsOnly
 ```
 
 Omit `-nogui` to open the GUI. Use `-help` for options and `-flush` to regenerate existing output.
@@ -27,6 +31,12 @@ Image export requires real 256×256 grass and foliage colormaps. Water is export
 Alpha chunk files and MCRegion (`.mcr`) saves are supported. Only Overworld chunks are scanned. Output is one 524288-byte `b.<x>.<z>.biome` file per occupied 32×32-chunk region.
 
 ## Compatibility
+
+**Intended version range: Alpha v1.2.0 through snapshot 12w06a, inclusive.** This covers the remaining Alpha releases, Beta releases, release 1.0 and 1.1, and the early 1.2 development snapshots before Anvil.
+
+Snapshot **12w07a** introduced Anvil (`.mca`) and saved biome data; **1.2.1** was the first stable Anvil release. For Anvil worlds, mapping tools should read the stored biomes directly. See the [Anvil format history](https://minecraft.wiki/w/Anvil_file_format).
+
+The intended range includes builds that have not yet been tested or may require additional binding profiles. Verified compatibility is listed below.
 
 Verified clients: **Alpha v1.2.0_02, Beta 1.3_01, Beta 1.8.1, and release 1.0**. The Beta 1.3-era server jar is also verified for coordinate extraction.
 
@@ -64,7 +74,7 @@ $env:MINECRAFT_1_0_JAR = "C:\jars\minecraft-1.0.jar"
 .\gradlew.bat integrationTest
 ```
 
-Missing variables skip dependent cases; invalid paths fail. Tests never download Minecraft assets. Keep JARs outside the checkout or in ignored `testdata`, and exclude them from CI artifacts. World fixtures are copied into `build` before use.
+Missing variables skip dependent test cases; invalid paths fail. Tests never download Minecraft assets. Keep JARs outside the checkout or in ignored `testdata`, and exclude them from CI artifacts. World fixtures are copied into `build` before use.
 
 ## Adding versions
 
