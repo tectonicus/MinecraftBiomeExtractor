@@ -144,7 +144,13 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 			world_processor.setFlush(delete_existing_files.isSelected());
 			
 			// Create a new thread and start it.
-			process_thread = new Thread(world_processor);
+			process_thread = new Thread(() -> {
+				try {
+					world_processor.run();
+				} catch (IllegalStateException e) {
+					SwingUtilities.invokeLater(() -> message("Extraction failed: " + e.getMessage() + newline));
+				}
+			});
 			process_thread.start();
 		}
 	}

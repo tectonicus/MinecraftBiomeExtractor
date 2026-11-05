@@ -8,6 +8,7 @@ public class MinecraftBiomeExtractor
 	{
 		boolean noGui = false;
 		boolean flush = false;
+		boolean coordinatesOnly = false;
 		boolean errorsOnly = false;
 		File jarLocation = null;
 		File outputDir = null;
@@ -27,6 +28,9 @@ public class MinecraftBiomeExtractor
 			else if (args[i].equalsIgnoreCase("-flush"))
 			{
 				flush = true;
+			}
+			else if (args[i].equalsIgnoreCase("-coordsOnly")) {
+				coordinatesOnly = true;
 			}
 			else if (args[i].equalsIgnoreCase("-help") || args[i].equalsIgnoreCase("-?") || args[i].equalsIgnoreCase("?"))
 			{
@@ -72,7 +76,8 @@ public class MinecraftBiomeExtractor
 		if (showHelp)
 		{
 			System.out.println("Minecraft Biome Extractor command line usage:");
-			System.out.println("\tjava -jar MinecraftBiomeExtractor.jar -nogui world_folder [-flush] [-quiet] [-jar jarloaction]");
+			System.out.println("\tjava -jar MinecraftBiomeExtractor.jar -nogui world_folder [-flush] [-quiet] [-coordsOnly] [-jar jarLocation]");
+			System.out.println("\t-coordsOnly exports .biome coordinates without requiring or writing colormap PNGs.");
 			System.out.println("\tYou can use the -jar option to launch the GUI with a manually secified JAR file.");
 		}
 		else if (!noGui)
@@ -89,6 +94,7 @@ public class MinecraftBiomeExtractor
 			
 			if (worldFolder.isDirectory())
 			{
+				int exitCode = 0;
 				// Create a world processor and bind to minecraft
 				try (WorldProcessor worldProcessor = new WorldProcessor(null, errorsOnly, flush)) {
 					if (manualJarLocation) {
@@ -98,18 +104,23 @@ public class MinecraftBiomeExtractor
 						System.out.print("Failed to bind to Minecraft, cannot generate biomes.\n"
 								+ "Review the above messages to see if there's anything you can do about it.\n"
 								+ "If not, check online for a new version.");
-						return;
+						exitCode = 1;
+					} else {
+						worldProcessor.setWorldFolder(worldFolder);
+						worldProcessor.setOutputDir(outputDir);
+						worldProcessor.setCoordinatesOnly(coordinatesOnly);
+						worldProcessor.run();
 					}
-					worldProcessor.setWorldFolder(worldFolder);
-					worldProcessor.setOutputDir(outputDir);
-					worldProcessor.run();
+				} catch (IllegalStateException e) {
+					System.err.println("Extraction failed: " + e.getMessage());
+					exitCode = 1;
 				} catch (java.io.IOException e) {
 					System.err.println("Could not release the Minecraft JAR: " + e.getMessage());
-					return;
+					exitCode = 1;
 				}
 				// Some historical client versions leave threads running after extraction.
 				// Close the processor before exiting so its temporary JAR is removed.
-				System.exit(0);
+				System.exit(exitCode);
 			}
 			else
 			{

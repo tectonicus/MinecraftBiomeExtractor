@@ -12,6 +12,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +40,9 @@ public class WorldProcessor implements Runnable, AutoCloseable
 	private MinecraftBindings bindings;
 	private boolean useGUI = true;
 
-	// Storage for the grasscolor and foliagecolor pngs
-	private BufferedImage grassColorImage = null;
-	private BufferedImage foliageColorImage = null;
-	private BufferedImage waterColorImage = null;
-	private boolean useDefaultBiomeImages = true;
+	private final Map<ColourType, BufferedImage> jarColourMaps = new EnumMap<>(ColourType.class);
+	private final Map<ColourType, BufferedImage> suppliedColourMaps = new EnumMap<>(ColourType.class);
+	private boolean coordinatesOnly;
 	
 	// World Variables
 	private File worldFolder = null;
@@ -65,8 +64,6 @@ public class WorldProcessor implements Runnable, AutoCloseable
 	{
 		this.useGUI = false;
 		this.errorsOnly = true;
-		
-		setupDefaultBiomeImages();
 	}
 	
 	public WorldProcessor(MinecraftBiomeExtractorGUI gui, final boolean errorsOnly, final boolean flush)
@@ -78,16 +75,6 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		
 		this.flush = flush;
 		this.errorsOnly = errorsOnly;
-		
-		setupDefaultBiomeImages();
-		
-	}
-	
-	private void setupDefaultBiomeImages()
-	{
-		grassColorImage = DefaultBiomeColors.create(ColourType.GrassColour);
-		foliageColorImage = DefaultBiomeColors.create(ColourType.FoliageColour);
-		waterColorImage = DefaultBiomeColors.create(ColourType.WaterColour);
 	}
 	
 	public boolean isBound()
@@ -125,6 +112,11 @@ public class WorldProcessor implements Runnable, AutoCloseable
 	{
 		this.flush = flush;
 	}
+
+	/** Exports only .biome coordinates, without requiring or writing colormap images. */
+	public void setCoordinatesOnly(boolean coordinatesOnly) {
+		this.coordinatesOnly = coordinatesOnly;
+	}
 	
 	public void run()
 	{
@@ -140,6 +132,12 @@ public class WorldProcessor implements Runnable, AutoCloseable
 			return;
 		}
 		
+		// Validate before flush can delete a previously successful export.
+		if (!coordinatesOnly) {
+			requireColourMap(ColourType.GrassColour);
+			requireColourMap(ColourType.FoliageColour);
+		}
+
 		if (outputDir == null)
 		{
 			outputDir = new File(worldFolder,"biomes");
@@ -310,40 +308,26 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		}
 	}
 
-    // If no EXTRACTEDBIOMES folder exists, make one.
-    // Copy in grasscolor.png, foliagecolor.png, and watercolor.png
-    private void setupDataFolder(final File biomesFolder)
-    {
-		if (!(biomesFolder.exists() && biomesFolder.isDirectory()))
-		{	
-			if (!biomesFolder.mkdir())
-			{
-				printm("No write access to world folder. Cannot continue."+NEW_LINE);
-				
-				return;
+	private void setupDataFolder(File directory) {
+		try {
+			Files.createDirectories(directory.toPath());
+			if (!coordinatesOnly) {
+				for (ColourType type : ColourType.values()) {
+					File output = new File(directory, colourMapName(type));
+					BufferedImage image = colourMap(type);
+					if (image != null) {
+						if (!ImageIO.write(image, "png", output))
+							throw new IOException("No PNG writer available for " + output);
+					} else {
+						Files.deleteIfExists(output.toPath());
+						printm("No real " + colourMapName(type) + " is available; this image will not be exported." + NEW_LINE);
+					}
+				}
 			}
+		} catch (IOException e) {
+			throw new IllegalStateException("Could not write biome output to " + directory, e);
 		}
-		
-		try
-		{
-			if (grassColorImage != null)
-			{
-				ImageIO.write(grassColorImage, "png", new File(biomesFolder,"grasscolor.png"));
-			}
-			if (foliageColorImage != null)
-			{
-				ImageIO.write(foliageColorImage, "png", new File(biomesFolder,"foliagecolor.png"));
-			}
-			if (waterColorImage != null)
-			{
-				ImageIO.write(waterColorImage, "png", new File(biomesFolder,"watercolor.png"));
-			}
-		}
-		catch (IOException e)
-		{
-			printm("Failed to write biome color pngs. Continuing..."+NEW_LINE);
-		}
-    }
+	}
     
 	public float[] getTemperaturesAtBlocks(float[] dest, int x, int z, int dx, int dz) throws Exception {
 		return requireBindings().climate(true, dest, x, z, dx, dz);
@@ -383,40 +367,17 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		return coords_translated;
 	}
 	  
-	  // Returns the biome color at a given block, packed in an int as RGB
-	  public int getRGBAtBlock(final int x, final int z, final ColourType type) throws Exception
-	  {
-		  final byte[] coords;
-		  try
-		  {
-			  coords = getCoordsAtBlock(x,z);
-		  }
-		  catch (Throwable e1)
-		  {
-			  throw(new Exception("Biome Extractor has failed to properly interface with Minecraft."));
-		  }
-		  	
-			if (type == ColourType.GrassColour)
-				return grassColorImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
-			else if (type == ColourType.FoliageColour)
-				return foliageColorImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
-			else if (type == ColourType.WaterColour)
-				return waterColorImage.getRGB((int)coords[0]&0xFF, (int)coords[1]&0xFF);
-			else
-				return 0;
-	  }
+	/** Returns an actual colormap pixel; missing maps are never approximated. */
+	public int getRGBAtBlock(int x, int z, ColourType type) throws Exception {
+		BufferedImage image = requireColourMap(type);
+		byte[] coords = getCoordsAtBlock(x, z);
+		return image.getRGB(coords[0] & 0xff, coords[1] & 0xff);
+	}
 	  
 	// Returns the biome color at a given block
 	public Color getColorAtBlock(final int x, final int z, final ColourType type) throws Exception
 	{
-		try
-		{
-			return new Color(getRGBAtBlock(x, z, type));
-		}
-		catch (Throwable e1)
-		{
-			throw(new Exception("Biome Extractor has failed to properly interface with Minecraft. (getColorAtBlock)"));
-		}
+		return new Color(getRGBAtBlock(x, z, type));
 	}
 	
 	public boolean setBiomeImages(final File grasscolor)
@@ -431,27 +392,69 @@ public class WorldProcessor implements Runnable, AutoCloseable
 	  
 	public boolean setBiomeImages(final File grasscolor, final File foliagecolor, final File watercolor)
 	{
-			try 
-			{
-				if (grasscolor != null)
-				{
-					grassColorImage = ImageIO.read(grasscolor);
+		Map<ColourType, BufferedImage> images = new EnumMap<>(ColourType.class);
+		File[] files = {grasscolor, foliagecolor, watercolor};
+		try {
+			for (ColourType type : ColourType.values()) {
+				File file = files[type.ordinal()];
+				if (file != null) {
+					try (InputStream input = Files.newInputStream(file.toPath())) {
+						images.put(type, readColourMap(input, file.toString()));
+					}
 				}
-				if (foliagecolor != null)
-				{
-					foliageColorImage = ImageIO.read(foliagecolor);
-				}
-				if (watercolor != null)
-				{
-					waterColorImage = ImageIO.read(foliagecolor);
-				}
-			} 
-			catch (IOException e) 
-			{
-				return false;
 			}
-		useDefaultBiomeImages = false;
+		} catch (IOException e) {
+			printe("Could not load biome colormaps: " + e.getMessage() + NEW_LINE);
+			return false;
+		}
+		suppliedColourMaps.clear();
+		suppliedColourMaps.putAll(images);
 		return true;
+	}
+
+	private BufferedImage colourMap(ColourType type) {
+		if (type == null)
+			throw new IllegalArgumentException("Specify a biome color type");
+		BufferedImage supplied = suppliedColourMaps.get(type);
+		return supplied != null ? supplied : jarColourMaps.get(type);
+	}
+
+	private BufferedImage requireColourMap(ColourType type) {
+		BufferedImage image = colourMap(type);
+		if (image == null)
+			throw new IllegalStateException("Missing real colormap " + colourMapName(type)
+					+ ". Use a client JAR containing it or supply a 256x256 image with setBiomeImages."
+					+ " Coordinate extraction remains available; use -coordsOnly for coordinate-only export.");
+		return image;
+	}
+
+	private static String colourMapName(ColourType type) {
+		switch (type) {
+			case GrassColour: return "grasscolor.png";
+			case FoliageColour: return "foliagecolor.png";
+			case WaterColour: return "watercolor.png";
+			default: throw new IllegalArgumentException("Unsupported biome color type: " + type);
+		}
+	}
+
+	private static BufferedImage readColourMap(InputStream input, String source) throws IOException {
+		BufferedImage image = ImageIO.read(input);
+		if (image == null || image.getWidth() != 256 || image.getHeight() != 256)
+			throw new IOException("Expected a readable 256x256 colormap: " + source);
+		return image;
+	}
+
+	private void loadColourMaps(ZipFile jar) {
+		for (ColourType type : ColourType.values()) {
+			ZipEntry entry = jar.getEntry("misc/" + colourMapName(type));
+			if (entry != null) {
+				try (InputStream input = jar.getInputStream(entry)) {
+					jarColourMaps.put(type, readColourMap(input, entry.getName()));
+				} catch (IOException e) {
+					printe("Could not load " + colourMapName(type) + ": " + e.getMessage() + NEW_LINE);
+				}
+			}
+		}
 	}
 	
 	public void setJarLocation(File mjar)
@@ -485,6 +488,7 @@ public class WorldProcessor implements Runnable, AutoCloseable
 	public void close() throws IOException {
 		bound = false;
 		bindings = null;
+		jarColourMaps.clear();
 		URLClassLoader loader = minecraftClassLoader;
 		minecraftClassLoader = null;
 		try {
@@ -536,27 +540,7 @@ public class WorldProcessor implements Runnable, AutoCloseable
 			minecraftJarCopy = Files.createTempFile("biomeextractor-", ".jar").toFile();
 			stripMinecraftJar(minecraftJar, minecraftJarCopy);
 			try (ZipFile mcjar = new ZipFile(minecraftJarCopy)) {
-				if (useDefaultBiomeImages) {
-					setupDefaultBiomeImages();
-					ZipEntry grasscolor = mcjar.getEntry("misc/grasscolor.png");
-					ZipEntry foliagecolor = mcjar.getEntry("misc/foliagecolor.png");
-					ZipEntry watercolor = mcjar.getEntry("misc/watercolor.png");
-					if (grasscolor != null) {
-						try (InputStream input = mcjar.getInputStream(grasscolor)) {
-							grassColorImage = ImageIO.read(input);
-						}
-					}
-					if (foliagecolor != null) {
-						try (InputStream input = mcjar.getInputStream(foliagecolor)) {
-							foliageColorImage = ImageIO.read(input);
-						}
-					}
-					if (watercolor != null) {
-						try (InputStream input = mcjar.getInputStream(watercolor)) {
-							waterColorImage = ImageIO.read(input);
-						}
-					}
-				}
+				loadColourMaps(mcjar);
 				Enumeration<? extends ZipEntry> entries = mcjar.entries();
 				while (entries.hasMoreElements()) {
 					String name = entries.nextElement().getName();

@@ -12,6 +12,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class GeneralTests {
@@ -56,6 +58,63 @@ class GeneralTests {
 	void testBasicApiWithServer() throws Exception {
 		try (WorldProcessor worldProcessor = loadWorld("MINECRAFT_BETA_13_SERVER_JAR")) {
 			assertMoistures(worldProcessor);
+			assertMissingMaps(worldProcessor);
+		}
+	}
+
+	@Test
+	void serverImageExportFailsBeforeFlushingAnExistingOutput() throws Exception {
+		File jar = fixture("MINECRAFT_BETA_13_SERVER_JAR");
+		Path world = temporaryDirectory.resolve("region-world");
+		FileUtils.copyFiles(new File("testdata/RegionWorld/world"), world.toFile(), new HashSet<>());
+		Path output = Files.createDirectory(temporaryDirectory.resolve("output"));
+		Path marker = Files.writeString(output.resolve("existing.biome"), "keep");
+		CommandResult result = commandLine(jar, world.toFile(), output.toFile(), false, true);
+		assertEquals(1, result.exitCode(), result.output());
+		assertTrue(result.output().contains("Missing real colormap grasscolor.png"), result.output());
+		assertTrue(result.output().contains("-coordsOnly"), result.output());
+		assertEquals("keep", Files.readString(marker));
+		assertFalse(Files.exists(output.resolve("grasscolor.png")));
+	}
+
+	@Test
+	void rebindingToServerClearsClientColorsAndAcceptsExplicitRealMaps() throws Exception {
+		File client = fixture("MINECRAFT_BETA_13_JAR");
+		File server = fixture("MINECRAFT_BETA_13_SERVER_JAR");
+		try (WorldProcessor processor = loadWorld("MINECRAFT_BETA_13_JAR")) {
+			int expected = processor.getRGBAtBlock(0, 0, WorldProcessor.ColourType.GrassColour);
+			bindWorld(processor, server);
+			assertMoistures(processor);
+			assertMissingMaps(processor);
+			Path grass = temporaryDirectory.resolve("grass.png");
+			try (ZipFile jar = new ZipFile(client); var input = jar.getInputStream(jar.getEntry("misc/grasscolor.png"))) {
+				Files.copy(input, grass);
+			}
+			assertTrue(processor.setBiomeImages(grass.toFile()));
+			assertEquals(expected, processor.getRGBAtBlock(0, 0, WorldProcessor.ColourType.GrassColour));
+			assertThrows(IllegalStateException.class, () -> processor.getColorAtBlock(0, 0, WorldProcessor.ColourType.FoliageColour));
+			assertTrue(processor.setBiomeImages(null, null, null));
+			assertMissingMaps(processor);
+			bindWorld(processor, client);
+			assertEquals(expected, processor.getRGBAtBlock(0, 0, WorldProcessor.ColourType.GrassColour));
+		}
+	}
+
+	@Test
+	void unreadableJarColorMapDoesNotPreventCoordinateExtraction() throws Exception {
+		File client = fixture("MINECRAFT_BETA_13_JAR");
+		Path damaged = temporaryDirectory.resolve("damaged-map.jar");
+		Files.copy(client.toPath(), damaged);
+		try (var zip = java.nio.file.FileSystems.newFileSystem(damaged)) {
+			Files.writeString(zip.getPath("/misc/grasscolor.png"), "Not a PNG");
+		}
+		try (WorldProcessor processor = loadWorld("MINECRAFT_BETA_13_JAR")) {
+			bindWorld(processor, damaged.toFile());
+			assertMoistures(processor);
+			IllegalStateException error = assertThrows(IllegalStateException.class,
+					() -> processor.getRGBAtBlock(0, 0, WorldProcessor.ColourType.GrassColour));
+			assertTrue(error.getMessage().contains("grasscolor.png"));
+			processor.getRGBAtBlock(0, 0, WorldProcessor.ColourType.FoliageColour);
 		}
 	}
 
@@ -109,6 +168,8 @@ class GeneralTests {
 			assertBatchMatchesSingles(processor, 19, 5);
 			assertBatchMatchesSingles(processor, 3, 19);
 			Path output = temporaryDirectory.resolve("alpha-biomes");
+			Files.createDirectories(output);
+			Files.writeString(output.resolve("watercolor.png"), "stale palette from an earlier export");
 			processor.setOutputDir(output.toFile());
 			processor.run();
 			assertEquals(List.of("b.0.-1.biome", "b.0.0.biome", "b.1.-1.biome", "b.1.0.biome"), regionFiles(output));
@@ -126,11 +187,8 @@ class GeneralTests {
 					}
 				}
 			}
-			for (String type : new String[] {"grass", "foliage", "water"}) {
-				BufferedImage image = ImageIO.read(output.resolve(type + "color.png").toFile());
-				assertEquals(256, image.getWidth());
-				assertEquals(256, image.getHeight());
-			}
+			assertRealColourMaps(new File(jar), output);
+			assertThrows(IllegalStateException.class, () -> processor.getRGBAtBlock(0, 0, WorldProcessor.ColourType.WaterColour));
 			bindWorld(processor, fixture("MINECRAFT_BETA_13_SERVER_JAR"));
 			assertEquals("Beta 1.3_01", processor.getBindingProfileName());
 			assertMoistures(processor);
@@ -145,6 +203,25 @@ class GeneralTests {
 		FileUtils.copyFiles(new File("testdata/RegionWorld/world"), worldDir, new HashSet<>());
 		File minecraftJar = fixture(jarName);
 		File outputDir = temporaryDirectory.resolve("biomes").toFile();
+		boolean coordinatesOnly = jarName.equals("MINECRAFT_BETA_13_SERVER_JAR");
+		CommandResult result = commandLine(minecraftJar, worldDir, outputDir, coordinatesOnly, false);
+		assertEquals(0, result.exitCode(), result.output());
+		assertTrue(outputDir.isDirectory(), result.output());
+		Path expected = Path.of("testdata/ExpectedRegionOutput");
+		List<String> expectedRegions = regionFiles(expected);
+		assertEquals(expectedRegions, regionFiles(outputDir.toPath()), result.output());
+		for (String name : expectedRegions) {
+			assertArrayEquals(Files.readAllBytes(expected.resolve(name)), Files.readAllBytes(outputDir.toPath().resolve(name)), name);
+		}
+		if (coordinatesOnly) {
+			for (String type : new String[] {"grass", "foliage", "water"})
+				assertFalse(Files.exists(outputDir.toPath().resolve(type + "color.png")));
+		} else {
+			assertRealColourMaps(minecraftJar, outputDir.toPath());
+		}
+	}
+
+	private CommandResult commandLine(File minecraftJar, File worldDir, File outputDir, boolean coordinatesOnly, boolean flush) throws Exception {
 		Path log = temporaryDirectory.resolve("extractor.log");
 		String executable = File.separatorChar == '\\' ? "java.exe" : "java";
 		String java = Path.of(System.getProperty("java.home"), "bin", executable).toString();
@@ -157,46 +234,51 @@ class GeneralTests {
 					.getParent().getParent().getParent();
 		}
 
-		Process process = new ProcessBuilder(java, "-Djava.awt.headless=true", "-cp",
+		List<String> command = new ArrayList<>(List.of(java, "-Djava.awt.headless=true", "-cp",
 				classpath, MinecraftBiomeExtractor.class.getName(),
-				"-nogui", worldDir.getPath(), "-outputDir", outputDir.getPath(), "-jar", minecraftJar.getPath())
+				"-nogui", worldDir.getPath(), "-outputDir", outputDir.getPath(), "-jar", minecraftJar.getPath()));
+		if (coordinatesOnly) command.add("-coordsOnly");
+		if (flush) command.add("-flush");
+		Process process = new ProcessBuilder(command)
 				.redirectErrorStream(true)
 				.redirectOutput(log.toFile())
 				.start();
 		try {
 			assertTrue(process.waitFor(60, TimeUnit.SECONDS), "Extraction timed out");
-			String output = Files.readString(log);
-			assertEquals(0, process.exitValue(), output);
-			assertTrue(outputDir.isDirectory(), output);
-			Path expected = Path.of("testdata/ExpectedRegionOutput");
-			List<String> expectedRegions = regionFiles(expected);
-			assertEquals(expectedRegions, regionFiles(outputDir.toPath()), output);
-			for (String name : expectedRegions) {
-				assertArrayEquals(Files.readAllBytes(expected.resolve(name)),
-						Files.readAllBytes(outputDir.toPath().resolve(name)), name);
-			}
-			for (String type : new String[] {"grass", "foliage", "water"}) {
-				BufferedImage reference;
-				try (ZipFile jar = new ZipFile(minecraftJar)) {
-					var entry = jar.getEntry("misc/" + type + "color.png");
-					if (entry != null) {
-						try (var input = jar.getInputStream(entry)) { reference = ImageIO.read(input); }
-					} else {
-						reference = DefaultBiomeColors.create(WorldProcessor.ColourType.valueOf(
-								type.substring(0, 1).toUpperCase() + type.substring(1) + "Colour"));
-					}
-				}
-				BufferedImage actual = ImageIO.read(new File(outputDir, type + "color.png"));
-				assertEquals(reference.getWidth(), actual.getWidth());
-				assertEquals(reference.getHeight(), actual.getHeight());
-				assertArrayEquals(reference.getRGB(0, 0, reference.getWidth(), reference.getHeight(), null, 0, reference.getWidth()),
-						actual.getRGB(0, 0, actual.getWidth(), actual.getHeight(), null, 0, actual.getWidth()), type + " colors");
-			}
+			return new CommandResult(process.exitValue(), Files.readString(log));
 		} finally {
 			if (process.isAlive()) {
 				process.destroyForcibly();
 				process.waitFor(5, TimeUnit.SECONDS);
 			}
+		}
+	}
+
+	private record CommandResult(int exitCode, String output) {}
+
+	private static void assertRealColourMaps(File minecraftJar, Path output) throws Exception {
+		try (ZipFile jar = new ZipFile(minecraftJar)) {
+			for (String type : new String[] {"grass", "foliage", "water"}) {
+				Path exported = output.resolve(type + "color.png");
+				var entry = jar.getEntry("misc/" + type + "color.png");
+				if (entry == null) {
+					assertFalse(Files.exists(exported), "Must not invent " + type + " colors");
+					continue;
+				}
+				BufferedImage reference;
+				try (var input = jar.getInputStream(entry)) { reference = ImageIO.read(input); }
+				BufferedImage actual = ImageIO.read(exported.toFile());
+				assertEquals(reference.getWidth(), actual.getWidth());
+				assertEquals(reference.getHeight(), actual.getHeight());
+				assertArrayEquals(reference.getRGB(0, 0, 256, 256, null, 0, 256), actual.getRGB(0, 0, 256, 256, null, 0, 256), type + " colors");
+			}
+		}
+	}
+
+	private static void assertMissingMaps(WorldProcessor processor) {
+		for (WorldProcessor.ColourType type : WorldProcessor.ColourType.values()) {
+			IllegalStateException error = assertThrows(IllegalStateException.class, () -> processor.getRGBAtBlock(0, 0, type));
+			assertTrue(error.getMessage().contains("Missing real colormap"));
 		}
 	}
 
