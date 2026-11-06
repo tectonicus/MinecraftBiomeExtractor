@@ -350,6 +350,11 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		return requireBindings().coordinates(dest, temps, moists, x, z, dx, dz);
 	}
 
+	/** Returns a row-major mask identifying the registered Beta-1.8+ swamp biome. */
+	public boolean[] getSwampMaskAtBlocks(int x, int z, int width, int depth) throws Exception {
+		return requireBindings().swampMask(x, z, width, depth);
+	}
+
 	private MinecraftBindings requireBindings() {
 		if (bindings == null) {
 			throw new IllegalStateException("Bind a Minecraft JAR before requesting biome data");

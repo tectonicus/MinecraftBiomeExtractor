@@ -150,6 +150,29 @@ final class MinecraftBindings {
 		return destination;
 	}
 
+	boolean[] swampMask(int x, int z, int width, int depth) throws ReflectiveOperationException {
+		requireWorld();
+		boolean[] result = new boolean[size(width, depth)];
+		// Pre-Beta-1.8 biomes have no modern numeric registry or special swamp tint.
+		if (profile.usesDoubleFields) return result;
+		Method point = generator.getClass().getMethod("a", int.class, int.class);
+		Class<?> biomeType = point.getReturnType();
+		Object swamp = null;
+		for (Field field : biomeType.getFields()) {
+			if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
+					&& field.getType().isArray() && field.getType().getComponentType() == biomeType) {
+				Object[] registry = (Object[])field.get(null);
+				if (registry != null && registry.length > 6) swamp = registry[6];
+			}
+		}
+		if (swamp == null) throw new NoSuchFieldException("Missing registered swamp biome");
+		Class<?> arrayType = java.lang.reflect.Array.newInstance(biomeType, 0).getClass();
+		Method batch = generator.getClass().getMethod("a", arrayType, int.class, int.class, int.class, int.class);
+		Object[] biomes = (Object[])batch.invoke(generator, null, x, z, width, depth);
+		for (int i = 0; i < result.length; i++) result[i] = biomes[i] == swamp;
+		return result;
+	}
+
 	private Climate legacyClimate(int x, int z, int width, int depth) throws ReflectiveOperationException {
 		Climate result = new Climate(size(width, depth));
 		// The legacy generator assumes square noise arrays and stores them in X-major order.

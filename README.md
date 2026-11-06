@@ -57,6 +57,8 @@ try (WorldProcessor processor = new WorldProcessor()) {
 }
 ```
 
+`getSwampMaskAtBlocks(x, z, width, depth)` returns a row-major mask of the generated Beta 1.8+ swamp biome, for consumers applying historical swamp tints. Earlier profiles return an all-false mask.
+
 Each processor owns an isolated class loader and temporary unsigned JAR. Close it after extraction stops; the source JAR is never modified. Bulk results use `x + z * width` ordering.
 
 `getRGBAtBlock` and `getColorAtBlock` require the requested colormap and throw `IllegalStateException` if it is missing. Coordinate and climate queries need no images. Supply external maps with `setBiomeImages(grass, foliage, water)`; null means no override. Invalid maps return `false`. Successful calls replace the overrides, which persist across rebinding. Use `setCoordinatesOnly(true)` for image-free exports.
