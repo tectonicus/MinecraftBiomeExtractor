@@ -84,7 +84,7 @@ public class MinecraftBiomeExtractor
 		if (showHelp)
 		{
 			System.out.println("Minecraft Biome Extractor " + BuildInfo.displayVersion() + " command line usage:");
-			System.out.println("\tjava -jar BiomeExtractor-" + BuildInfo.version() + ".jar -nogui world_folder"
+			System.out.println("\tjava -jar biome-extractor-" + BuildInfo.version() + ".jar -nogui world_folder"
 					+ " [-jar jarLocation] [-outputDir dir] [-flush] [-quiet] [-coordsOnly]");
 			System.out.println("\t-jar uses this Minecraft client or server JAR instead of the installed minecraft.jar.");
 			System.out.println("\t-outputDir writes output here instead of world_folder/biomes.");

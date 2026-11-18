@@ -2,7 +2,7 @@ plugins {
 	id("com.gradleup.nmcp.settings") version "1.6.2"
 }
 
-rootProject.name = "BiomeExtractor"
+rootProject.name = "biome-extractor"
 
 // Central Portal token: set mavenCentralUsername/mavenCentralPassword in ~/.gradle/gradle.properties,
 // or MAVEN_CENTRAL_USERNAME/MAVEN_CENTRAL_PASSWORD in the environment. ORG_GRADLE_PROJECT_* variables

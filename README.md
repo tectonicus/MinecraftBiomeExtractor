@@ -12,16 +12,16 @@ Historical users included **mcmap**, **MCMap Live**, **Minemapper**, **Minecraft
 .\gradlew.bat build
 ```
 
-Use `./gradlew` on macOS/Linux. The executable JAR is `build/libs/BiomeExtractor-2.0.0.jar`; sources and javadoc JARs are also produced.
+Use `./gradlew` on macOS/Linux. The executable JAR is `build/libs/biome-extractor-2.0.0.jar`; sources and javadoc JARs are also produced.
 
 ## Usage
 
 ```powershell
 # Export coordinates and available real colormaps
-java -jar build/libs/BiomeExtractor-2.0.0.jar -nogui path/to/world -jar path/to/client.jar
+java -jar build/libs/biome-extractor-2.0.0.jar -nogui path/to/world -jar path/to/client.jar
 
 # Export coordinates only, including with supported server JARs
-java -jar build/libs/BiomeExtractor-2.0.0.jar -nogui path/to/world -jar path/to/server.jar -coordsOnly
+java -jar build/libs/biome-extractor-2.0.0.jar -nogui path/to/world -jar path/to/server.jar -coordsOnly
 ```
 
 Omit `-nogui` to open the GUI. Use `-help` for options and `-flush` to regenerate existing output.
@@ -65,7 +65,7 @@ Each processor owns an isolated class loader and temporary unsigned JAR. Close i
 
 ## Publishing
 
-Releases go to Maven Central as `org.tectonicus:BiomeExtractor` through the [nmcp](https://gradleup.com/nmcp/) plugin. Publishing a GitHub release runs [`.github/workflows/publish.yml`](.github/workflows/publish.yml), which needs these repository secrets: `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` (a Central Portal user token), `GPG_PRIVATE_KEY` (ASCII-armored) and, for a passphrase-protected key, `GPG_PASSWORD`. Bump `version` in `build.gradle.kts` first: the release tag must match it (`v2.0.0` for `2.0.0`) or the job fails before uploading. Pre-releases are never published. Publishing also runs `check`.
+Releases go to Maven Central as `org.tectonicus:biome-extractor` through the [nmcp](https://gradleup.com/nmcp/) plugin. Publishing a GitHub release runs [`.github/workflows/publish.yml`](.github/workflows/publish.yml), which needs these repository secrets: `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` (a Central Portal user token), `GPG_PRIVATE_KEY` (ASCII-armored) and, for a passphrase-protected key, `GPG_PASSWORD`. Bump `version` in `build.gradle.kts` first: the release tag must match it (`v2.0.0` for `2.0.0`) or the job fails before uploading. Pre-releases are never published. Publishing also runs `check`.
 
 To publish locally instead, put the same values in `~/.gradle/gradle.properties`:
 
