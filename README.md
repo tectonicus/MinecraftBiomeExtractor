@@ -63,27 +63,6 @@ Each processor owns an isolated class loader and temporary unsigned JAR. Close i
 
 `getRGBAtBlock` and `getColorAtBlock` require the requested colormap and throw `IllegalStateException` if it is missing. Coordinate and climate queries need no images. Supply external maps with `setBiomeImages(grass, foliage, water)`; null means no override. Invalid maps return `false`. Successful calls replace the overrides, which persist across rebinding. Use `setCoordinatesOnly(true)` for image-free exports.
 
-## Publishing
-
-Releases go to Maven Central as `org.tectonicus:biome-extractor` through the [nmcp](https://gradleup.com/nmcp/) plugin. Publishing a GitHub release runs [`.github/workflows/publish.yml`](.github/workflows/publish.yml), which needs these repository secrets: `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` (a Central Portal user token), `GPG_PRIVATE_KEY` (ASCII-armored) and, for a passphrase-protected key, `GPG_PASSWORD`. Bump `version` in `build.gradle.kts` first: the release tag must match it (`v2.0.0` for `2.0.0`) or the job fails before uploading. Pre-releases are never published. Publishing also runs `check`.
-
-To publish locally instead, put the same values in `~/.gradle/gradle.properties`:
-
-```properties
-mavenCentralUsername=...       # or MAVEN_CENTRAL_USERNAME
-mavenCentralPassword=...       # or MAVEN_CENTRAL_PASSWORD
-signingInMemoryKey=...         # or ORG_GRADLE_PROJECT_signingInMemoryKey
-signingInMemoryKeyPassword=... # or ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
-```
-
-Without `signingInMemoryKey`, the `gpg` command-line tool's default key is used. Then run:
-
-```powershell
-.\gradlew.bat publishAggregationToCentralPortal
-```
-
-Deployments are released automatically once Central validates them; progress is visible at https://central.sonatype.com/publishing/deployments. `publishToMavenLocal` works without keys or credentials.
-
 ## Tests
 
 Tests use JUnit 6. `build` runs unit tests and compiles integration tests. To run integration tests, supply local JARs with absolute paths:
