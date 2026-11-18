@@ -1,4 +1,4 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,7 @@ enum BindingProfile {
 		this.displayName = displayName;
 		this.worldApi = worldApi;
 		this.usesDoubleFields = usesDoubleFields;
-		try (InputStream input = BindingProfile.class.getResourceAsStream("/biomeextractor/signatures/" + resource)) {
+		try (InputStream input = BindingProfile.class.getResourceAsStream("/org/tectonicus/biomeextractor/signatures/" + resource)) {
 			if (input == null) {
 				throw new IOException("Missing binding profile: " + resource);
 			}

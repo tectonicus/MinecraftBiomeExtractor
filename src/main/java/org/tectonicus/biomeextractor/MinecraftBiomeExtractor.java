@@ -1,10 +1,18 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import java.io.File;
 
+/** Command-line and GUI entry point. Run with {@code -help} for options. */
 public class MinecraftBiomeExtractor
 {
-	public static void main(String[] args) 
+	private MinecraftBiomeExtractor() {}
+
+	/**
+	 * Starts the GUI, or with {@code -nogui} exports a world from the command line.
+	 *
+	 * @param args command-line options and the world folder
+	 */
+	public static void main(String[] args)
 	{
 		boolean noGui = false;
 		boolean flush = false;
@@ -75,10 +83,15 @@ public class MinecraftBiomeExtractor
 		
 		if (showHelp)
 		{
-			System.out.println("Minecraft Biome Extractor command line usage:");
-			System.out.println("\tjava -jar MinecraftBiomeExtractor.jar -nogui world_folder [-flush] [-quiet] [-coordsOnly] [-jar jarLocation]");
+			System.out.println("Minecraft Biome Extractor " + BuildInfo.displayVersion() + " command line usage:");
+			System.out.println("\tjava -jar BiomeExtractor-" + BuildInfo.version() + ".jar -nogui world_folder"
+					+ " [-jar jarLocation] [-outputDir dir] [-flush] [-quiet] [-coordsOnly]");
+			System.out.println("\t-jar uses this Minecraft client or server JAR instead of the installed minecraft.jar.");
+			System.out.println("\t-outputDir writes output here instead of world_folder/biomes.");
+			System.out.println("\t-flush deletes existing output and regenerates it.");
+			System.out.println("\t-quiet prints only errors.");
 			System.out.println("\t-coordsOnly exports .biome coordinates without requiring or writing colormap PNGs.");
-			System.out.println("\tYou can use the -jar option to launch the GUI with a manually secified JAR file.");
+			System.out.println("\tWithout -nogui the GUI opens; -jar also works there to choose the JAR.");
 		}
 		else if (!noGui)
 		{

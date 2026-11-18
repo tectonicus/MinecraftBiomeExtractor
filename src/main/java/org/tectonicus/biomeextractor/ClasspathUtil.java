@@ -1,11 +1,11 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-public final class ClasspathUtil {
+final class ClasspathUtil {
 	private ClasspathUtil() {
 	}
 

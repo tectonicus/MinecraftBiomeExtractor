@@ -1,4 +1,4 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
-public class FileUtils
+final class FileUtils
 {
 	public static boolean deleteDirectory(File path)
 	{

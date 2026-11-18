@@ -1,4 +1,4 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -20,12 +20,43 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Reconstructs biome colormap coordinates for historical Minecraft worlds by running the generator of a matching
+ * Minecraft JAR with the world's seed.
+ *
+ * <p>Typical use:
+ * <pre>{@code
+ * try (WorldProcessor processor = new WorldProcessor()) {
+ *     processor.setJarLocation(minecraftJar);
+ *     processor.setWorldFolder(worldDirectory);
+ *     if (!processor.bindToMinecraft() || !processor.loadWorld()) {
+ *         throw new IllegalStateException("Unsupported Minecraft JAR or world");
+ *     }
+ *     byte[] coordinates = processor.getCoordsAtBlock(0, 0);
+ * }
+ * }</pre>
+ *
+ * <p>Each processor owns an isolated class loader and a temporary copy of the Minecraft JAR with its signatures
+ * removed; the source JAR is never modified. {@link #close()} releases both, so close the processor once extraction
+ * has stopped. Instances are not thread-safe, apart from {@link #stopRunning()}.
+ *
+ * <p>Bulk queries cover a {@code width} by {@code depth} area starting at block ({@code x}, {@code z}) and return
+ * results in row-major order: the value for block ({@code x + i}, {@code z + j}) is at index {@code i + j * width}.
+ *
+ * <p>Coordinate and climate queries need no images. Colour queries need a real 256x256 colormap, either loaded from
+ * the client JAR's {@code misc/} folder or supplied with {@link #setBiomeImages(File, File, File)}; missing colormaps
+ * are never approximated.
+ */
 public class WorldProcessor implements Runnable, AutoCloseable
 {
+	/** The colormaps a block colour can be looked up in. */
 	public enum ColourType
 	{
+		/** {@code grasscolor.png}. */
 		GrassColour,
+		/** {@code foliagecolor.png}. */
 		FoliageColour,
+		/** {@code watercolor.png}, which only some Minecraft versions include. */
 		WaterColour
 	}
 	
@@ -60,13 +91,14 @@ public class WorldProcessor implements Runnable, AutoCloseable
 	private boolean bound = false;	// Is set to true if the extractor bound to Minecraft properly
 	private volatile boolean die = false;  	// Set to true to abort the process if run in a separate thread.
 	
+	/** Creates a processor that prints only errors, to standard output. */
 	public WorldProcessor()
 	{
 		this.useGUI = false;
 		this.errorsOnly = true;
 	}
-	
-	public WorldProcessor(MinecraftBiomeExtractorGUI gui, final boolean errorsOnly, final boolean flush)
+
+	WorldProcessor(MinecraftBiomeExtractorGUI gui, final boolean errorsOnly, final boolean flush)
 	{
 		if (gui == null)
 			useGUI = false;
@@ -77,17 +109,32 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		this.errorsOnly = errorsOnly;
 	}
 	
+	/**
+	 * Returns whether a Minecraft JAR is currently bound.
+	 *
+	 * @return true after a successful {@link #bindToMinecraft()} and until {@link #close()}
+	 */
 	public boolean isBound()
 	{
 		return bound;
 	}
-	
+
+	/**
+	 * Asks a running {@link #run()} to stop after the current region. Regions already written are kept, so a later
+	 * run continues where this one stopped. Safe to call from another thread.
+	 */
 	public void stopRunning()
 	{
 		die = true;
 		return;
 	}
-	
+
+	/**
+	 * Sets the world save folder to process.
+	 *
+	 * @param world_folder the save folder containing {@code level.dat}
+	 * @return false, clearing the current world, if the folder does not exist
+	 */
 	public boolean setWorldFolder(File world_folder)
 	{
 		if (world_folder.exists() && world_folder.isDirectory())
@@ -103,21 +150,48 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		}
 	}
 	
+	/**
+	 * Sets where {@link #run()} writes its output.
+	 *
+	 * @param dir the output folder, or null for a {@code biomes} folder inside the world folder
+	 */
 	public void setOutputDir(File dir)
 	{
 		this.outputDir = dir;
 	}
-	
+
+	/**
+	 * Sets whether {@link #run()} deletes existing output first. Otherwise regions that already have a
+	 * {@code .biome} file are skipped.
+	 *
+	 * @param flush true to regenerate all output
+	 */
 	public void setFlush(boolean flush)
 	{
 		this.flush = flush;
 	}
 
-	/** Exports only .biome coordinates, without requiring or writing colormap images. */
+	/**
+	 * Sets whether {@link #run()} exports only {@code .biome} coordinates, without requiring or writing colormap
+	 * images.
+	 *
+	 * @param coordinatesOnly true for an image-free export
+	 */
 	public void setCoordinatesOnly(boolean coordinatesOnly) {
 		this.coordinatesOnly = coordinatesOnly;
 	}
-	
+
+	/**
+	 * Exports the whole world: one 524288-byte {@code b.<x>.<z>.biome} file per occupied 32-by-32-chunk region, plus
+	 * the available colormap PNGs unless {@linkplain #setCoordinatesOnly(boolean) coordinates only} is set. Each file
+	 * holds two bytes per block, colormap y then x, for 512 by 512 blocks in row-major order.
+	 *
+	 * <p>Requires a bound JAR and a world folder; the world is loaded automatically, before any existing output is
+	 * {@linkplain #setFlush(boolean) flushed}. Progress and errors are reported as text rather than thrown, except
+	 * for a missing grass or foliage colormap, which throws {@link IllegalStateException} before anything is
+	 * deleted.
+	 */
+	@Override
 	public void run()
 	{
 		// Reset some key variables
@@ -144,23 +218,24 @@ public class WorldProcessor implements Runnable, AutoCloseable
 			printm("No output dir specified." + NEW_LINE + "Placing output in "+ outputDir.getAbsolutePath() + NEW_LINE);
 		}
 		
-		if (outputDir.exists() && flush)
-		{
-			printm("Deleting existing biome data in " + outputDir.getAbsolutePath() + NEW_LINE);
-			FileUtils.deleteDirectory(outputDir);
-		}
-	
 		printm("Opening " + worldFolder.getName() + "..." + NEW_LINE);
-		
-		this.setupDataFolder(outputDir);
 
+		// Load the world before flushing, so a JAR that cannot read it leaves the previous export intact.
 		printm("Locating Minecraft save..."+NEW_LINE);
 		if (!this.loadWorld())
 		{
 			printe("Minecraft classes failed to load the world."+ NEW_LINE);
 			return;
 		}
-		
+
+		if (outputDir.exists() && flush)
+		{
+			printm("Deleting existing biome data in " + outputDir.getAbsolutePath() + NEW_LINE);
+			FileUtils.deleteDirectory(outputDir);
+		}
+
+		this.setupDataFolder(outputDir);
+
 			// (16 blocks per chunk * 32 chunks per region)^2 * 2 bytes per coord = 524288
 			byte[] data = new byte[524288];
 			
@@ -288,11 +363,22 @@ public class WorldProcessor implements Runnable, AutoCloseable
 			System.out.print(msg);
 	}
 	
-	/** Returns the selected API profile, or null when no JAR is bound. */
+	/**
+	 * Returns the name of the binding profile that matched the bound JAR. Profiles name a range of Minecraft API
+	 * generations, not an exact version.
+	 *
+	 * @return the profile name, or null when no JAR is bound
+	 */
 	public String getBindingProfileName() {
 		return bindings == null ? null : bindings.profile.displayName;
 	}
 
+	/**
+	 * Loads the world folder with the bound JAR so the generator uses the world's seed. Call it after
+	 * {@link #bindToMinecraft()} and before any coordinate, climate or colour query.
+	 *
+	 * @return false, after reporting why, if no JAR is bound, no world is set, or Minecraft cannot load the world
+	 */
 	public boolean loadWorld() {
 		if (bindings == null || worldFolder == null) {
 			printe("Bind a Minecraft JAR and select a world before loading." + NEW_LINE);
@@ -329,28 +415,97 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		}
 	}
     
+	/**
+	 * Returns the generator's temperature for an area of blocks.
+	 *
+	 * @param dest an array to reuse, or null; always use the returned array, which may be a new one
+	 * @param x the first block's x coordinate
+	 * @param z the first block's z coordinate
+	 * @param dx the area's width, in blocks
+	 * @param dz the area's depth, in blocks
+	 * @return temperatures from 0 to 1, in row-major order
+	 * @throws IllegalStateException if no JAR is bound or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 */
 	public float[] getTemperaturesAtBlocks(float[] dest, int x, int z, int dx, int dz) throws Exception {
 		return requireBindings().climate(true, dest, x, z, dx, dz);
 	}
 
+	/**
+	 * Returns the generator's temperature at one block.
+	 *
+	 * @param x the block's x coordinate
+	 * @param z the block's z coordinate
+	 * @return a temperature from 0 to 1
+	 * @throws IllegalStateException if no JAR is bound or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 */
 	public double getTemperatureAtBlock(int x, int z) throws Exception {
 		return requireBindings().climateAtBlock(true, x, z);
 	}
 
+	/**
+	 * Returns the generator's moisture (rainfall) for an area of blocks.
+	 *
+	 * @param dest an array to reuse, or null; always use the returned array, which may be a new one
+	 * @param x the first block's x coordinate
+	 * @param z the first block's z coordinate
+	 * @param dx the area's width, in blocks
+	 * @param dz the area's depth, in blocks
+	 * @return moistures from 0 to 1, in row-major order
+	 * @throws IllegalStateException if no JAR is bound or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 */
 	public float[] getMoisturesAtBlocks(float[] dest, int x, int z, int dx, int dz) throws Exception {
 		return requireBindings().climate(false, dest, x, z, dx, dz);
 	}
 
+	/**
+	 * Returns the generator's moisture (rainfall) at one block.
+	 *
+	 * @param x the block's x coordinate
+	 * @param z the block's z coordinate
+	 * @return a moisture from 0 to 1
+	 * @throws IllegalStateException if no JAR is bound or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 */
 	public double getMoistureAtBlock(int x, int z) throws Exception {
 		return requireBindings().climateAtBlock(false, x, z);
 	}
 
+	/**
+	 * Returns colormap coordinates for an area of blocks. For temperature {@code t} and moisture {@code m}, a block's
+	 * colormap pixel is x = {@code (1 - t) * 255}, y = {@code (1 - m * t) * 255}.
+	 *
+	 * @param dest an array to reuse, or null; reused only if its length is exactly {@code dx * dz}
+	 * @param temps a scratch array for temperatures, or null
+	 * @param moists a scratch array for moistures, or null
+	 * @param x the first block's x coordinate
+	 * @param z the first block's z coordinate
+	 * @param dx the area's width, in blocks
+	 * @param dz the area's depth, in blocks
+	 * @return coordinates in row-major order
+	 * @throws IllegalStateException if no JAR is bound or no world is loaded
+	 * @throws IllegalArgumentException if {@code dx} or {@code dz} is not positive
+	 * @throws Exception if the Minecraft generator fails
+	 */
 	public ByteCoord[] getCoordsAtBlocks(ByteCoord[] dest, float[] temps, float[] moists, int x, int z, int dx, int dz)
 			throws Exception {
 		return requireBindings().coordinates(dest, temps, moists, x, z, dx, dz);
 	}
 
-	/** Returns a row-major mask identifying the registered Beta-1.8+ swamp biome. */
+	/**
+	 * Returns which blocks in an area are in the generated swamp biome, for consumers applying the Beta 1.8+ swamp
+	 * tint. Profiles older than Beta 1.8 have no swamp tint and return an all-false mask.
+	 *
+	 * @param x the first block's x coordinate
+	 * @param z the first block's z coordinate
+	 * @param width the area's width, in blocks
+	 * @param depth the area's depth, in blocks
+	 * @return true for swamp blocks, in row-major order
+	 * @throws IllegalStateException if no JAR is bound or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 */
 	public boolean[] getSwampMaskAtBlocks(int x, int z, int width, int depth) throws Exception {
 		return requireBindings().swampMask(x, z, width, depth);
 	}
@@ -362,7 +517,17 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		return bindings;
 	}
 
-	public byte[] getCoordsAtBlock(final int x, final int z) throws Exception // Returns the location of the biome color in the 256x256 biome PNG (two bytes)
+	/**
+	 * Returns the colormap coordinates for one block.
+	 *
+	 * @param x the block's x coordinate
+	 * @param z the block's z coordinate
+	 * @return two bytes, the pixel's x then y in a 256x256 colormap; read them as unsigned ({@code & 0xff})
+	 * @throws IllegalStateException if no JAR is bound or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 * @see #getCoordsAtBlocks(ByteCoord[], float[], float[], int, int, int, int)
+	 */
+	public byte[] getCoordsAtBlock(final int x, final int z) throws Exception
 	{
 		ByteCoord[] coords = getCoordsAtBlocks(null, null, null, x, z, 1, 1);
 		byte[] coords_translated = new byte[2];
@@ -372,29 +537,73 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		return coords_translated;
 	}
 	  
-	/** Returns an actual colormap pixel; missing maps are never approximated. */
+	/**
+	 * Returns a block's colour from a real colormap. This does not apply the swamp tint; see
+	 * {@link #getSwampMaskAtBlocks(int, int, int, int)}.
+	 *
+	 * @param x the block's x coordinate
+	 * @param z the block's z coordinate
+	 * @param type the colormap to read
+	 * @return the colormap pixel as packed ARGB, as {@link BufferedImage#getRGB(int, int)} returns it
+	 * @throws IllegalStateException if the colormap is missing, no JAR is bound, or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 */
 	public int getRGBAtBlock(int x, int z, ColourType type) throws Exception {
 		BufferedImage image = requireColourMap(type);
 		byte[] coords = getCoordsAtBlock(x, z);
 		return image.getRGB(coords[0] & 0xff, coords[1] & 0xff);
 	}
-	  
-	// Returns the biome color at a given block
+
+	/**
+	 * Returns a block's colour from a real colormap, as a {@link Color}.
+	 *
+	 * @param x the block's x coordinate
+	 * @param z the block's z coordinate
+	 * @param type the colormap to read
+	 * @return the colormap pixel
+	 * @throws IllegalStateException if the colormap is missing, no JAR is bound, or no world is loaded
+	 * @throws Exception if the Minecraft generator fails
+	 * @see #getRGBAtBlock(int, int, ColourType)
+	 */
 	public Color getColorAtBlock(final int x, final int z, final ColourType type) throws Exception
 	{
 		return new Color(getRGBAtBlock(x, z, type));
 	}
-	
+
+	/**
+	 * Supplies a grass colormap and clears any foliage and water overrides.
+	 *
+	 * @param grasscolor a 256x256 image, or null
+	 * @return false if the image cannot be read
+	 * @see #setBiomeImages(File, File, File)
+	 */
 	public boolean setBiomeImages(final File grasscolor)
 	{
 		return setBiomeImages(grasscolor, null, null);
 	}
-	
+
+	/**
+	 * Supplies grass and foliage colormaps and clears any water override.
+	 *
+	 * @param grasscolor a 256x256 image, or null
+	 * @param foliagecolor a 256x256 image, or null
+	 * @return false if an image cannot be read
+	 * @see #setBiomeImages(File, File, File)
+	 */
 	public boolean setBiomeImages(final File grasscolor, final File foliagecolor)
 	{
 		return setBiomeImages(grasscolor, foliagecolor, null);
 	}
-	  
+
+	/**
+	 * Supplies colormaps that take precedence over those in the Minecraft JAR. A successful call replaces all earlier
+	 * overrides, and overrides persist when another JAR is bound. If any image is invalid, nothing changes.
+	 *
+	 * @param grasscolor a 256x256 image, or null for no override
+	 * @param foliagecolor a 256x256 image, or null for no override
+	 * @param watercolor a 256x256 image, or null for no override
+	 * @return false, after reporting why, if an image cannot be read or is not 256x256
+	 */
 	public boolean setBiomeImages(final File grasscolor, final File foliagecolor, final File watercolor)
 	{
 		Map<ColourType, BufferedImage> images = new EnumMap<>(ColourType.class);
@@ -462,11 +671,22 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		}
 	}
 	
+	/**
+	 * Sets the Minecraft client or server JAR to bind to. Use the JAR matching the generator that created the world.
+	 *
+	 * @param mjar the JAR, or null to look for {@code minecraft.jar} in the local Minecraft installation
+	 */
 	public void setJarLocation(File mjar)
 	{
 		minecraftJar = mjar;
 	}
-	
+
+	/**
+	 * Binds to the JAR set with {@link #setJarLocation(File)}, releasing any previous binding first. The JAR is copied
+	 * without its signatures, its colormaps are loaded, and each known binding profile is tried until one matches.
+	 *
+	 * @return false, after reporting why, if the JAR is missing, unreadable, or matches no profile
+	 */
 	public boolean bindToMinecraft()
 	{
 		try {
@@ -488,7 +708,12 @@ public class WorldProcessor implements Runnable, AutoCloseable
 		}
 	}
 
-	/** Releases this processor's class loader and temporary JAR. Do not call while extracting. */
+	/**
+	 * Releases this processor's class loader and temporary JAR. Do not call while extracting. The processor can be
+	 * bound again afterwards; supplied colormaps are kept.
+	 *
+	 * @throws IOException if the temporary JAR cannot be deleted
+	 */
 	@Override
 	public void close() throws IOException {
 		bound = false;

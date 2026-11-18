@@ -1,4 +1,4 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -230,7 +230,7 @@ class GeneralTests {
 		String classpath = application.toString();
 		if (Files.isDirectory(application)) {
 			classpath += File.pathSeparator + Path.of(WorldProcessor.class
-					.getResource("/biomeextractor/signatures/beta-1.3_01.properties").toURI())
+					.getResource("/org/tectonicus/biomeextractor/signatures/beta-1.3_01.properties").toURI())
 					.getParent().getParent().getParent();
 		}
 

@@ -1,0 +1,36 @@
+name: Publish to Maven Central
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    # Central releases are permanent, so pre-releases never publish.
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Validates the Gradle wrapper checksum before it runs with the release secrets.
+      - uses: gradle/actions/setup-gradle@v6
+
+      # The publish task also runs `check` and verifies that the release tag matches the project version.
+      - name: Publish
+        run: ./gradlew publishAggregationToCentralPortal -PreleaseTag="$RELEASE_TAG"
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          # Read by settings.gradle.kts (nmcp), which cannot see ORG_GRADLE_PROJECT_* project properties.
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_PASSWORD }}

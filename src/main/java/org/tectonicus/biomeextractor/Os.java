@@ -1,6 +1,6 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
-public class Os
+final class Os
 {
 	public static boolean isWindows()
 	{

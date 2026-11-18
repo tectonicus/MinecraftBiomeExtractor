@@ -1,4 +1,4 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import org.junit.jupiter.api.Test;
 

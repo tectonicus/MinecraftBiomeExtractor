@@ -12,16 +12,16 @@ Historical users included **mcmap**, **MCMap Live**, **Minemapper**, **Minecraft
 .\gradlew.bat build
 ```
 
-Use `./gradlew` on macOS/Linux. The executable JAR is `build/libs/BiomeExtractor-1.1.0.jar`; a sources JAR is also produced.
+Use `./gradlew` on macOS/Linux. The executable JAR is `build/libs/BiomeExtractor-2.0.0.jar`; sources and javadoc JARs are also produced.
 
 ## Usage
 
 ```powershell
 # Export coordinates and available real colormaps
-java -jar build/libs/BiomeExtractor-1.1.0.jar -nogui path/to/world -jar path/to/client.jar
+java -jar build/libs/BiomeExtractor-2.0.0.jar -nogui path/to/world -jar path/to/client.jar
 
 # Export coordinates only, including with supported server JARs
-java -jar build/libs/BiomeExtractor-1.1.0.jar -nogui path/to/world -jar path/to/server.jar -coordsOnly
+java -jar build/libs/BiomeExtractor-2.0.0.jar -nogui path/to/world -jar path/to/server.jar -coordsOnly
 ```
 
 Omit `-nogui` to open the GUI. Use `-help` for options and `-flush` to regenerate existing output.
@@ -45,7 +45,7 @@ Other server versions remain unverified. Similar releases may match a binding pr
 ## Java API
 
 ```java
-import biomeextractor.WorldProcessor;
+import org.tectonicus.biomeextractor.WorldProcessor;
 
 try (WorldProcessor processor = new WorldProcessor()) {
     processor.setJarLocation(minecraftJar);
@@ -62,6 +62,27 @@ try (WorldProcessor processor = new WorldProcessor()) {
 Each processor owns an isolated class loader and temporary unsigned JAR. Close it after extraction stops; the source JAR is never modified. Bulk results use `x + z * width` ordering.
 
 `getRGBAtBlock` and `getColorAtBlock` require the requested colormap and throw `IllegalStateException` if it is missing. Coordinate and climate queries need no images. Supply external maps with `setBiomeImages(grass, foliage, water)`; null means no override. Invalid maps return `false`. Successful calls replace the overrides, which persist across rebinding. Use `setCoordinatesOnly(true)` for image-free exports.
+
+## Publishing
+
+Releases go to Maven Central as `org.tectonicus:BiomeExtractor` through the [nmcp](https://gradleup.com/nmcp/) plugin. Publishing a GitHub release runs [`.github/workflows/publish.yml`](.github/workflows/publish.yml), which needs these repository secrets: `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` (a Central Portal user token), `GPG_PRIVATE_KEY` (ASCII-armored) and, for a passphrase-protected key, `GPG_PASSWORD`. Bump `version` in `build.gradle.kts` first: the release tag must match it (`v2.0.0` for `2.0.0`) or the job fails before uploading. Pre-releases are never published. Publishing also runs `check`.
+
+To publish locally instead, put the same values in `~/.gradle/gradle.properties`:
+
+```properties
+mavenCentralUsername=...       # or MAVEN_CENTRAL_USERNAME
+mavenCentralPassword=...       # or MAVEN_CENTRAL_PASSWORD
+signingInMemoryKey=...         # or ORG_GRADLE_PROJECT_signingInMemoryKey
+signingInMemoryKeyPassword=... # or ORG_GRADLE_PROJECT_signingInMemoryKeyPassword
+```
+
+Without `signingInMemoryKey`, the `gpg` command-line tool's default key is used. Then run:
+
+```powershell
+.\gradlew.bat publishAggregationToCentralPortal
+```
+
+Deployments are released automatically once Central validates them; progress is visible at https://central.sonatype.com/publishing/deployments. `publishToMavenLocal` works without keys or credentials.
 
 ## Tests
 
@@ -83,8 +104,12 @@ Missing variables skip dependent test cases; invalid paths fail. Tests never dow
 Binding profiles identify Minecraft classes by their constructors, methods, and fields rather than obfuscated class names. To support another release:
 
 1. **Try an existing profile first.** Bind the new JAR and check `getBindingProfileName()`. A successful match still needs verification of world loading and generated coordinates; release 1.0, for example, works with the Beta 1.8.1 profile.
-2. **Identify changed classes.** Inspect the JAR with a decompiler, then use `ReflectionUtil.generateClassSignature(className, loader)` with that JAR's class loader. Compare the world, biome generator, and any save-handler, world-info, or server-dimension classes against the closest existing profile.
-3. **Register new signatures when needed.** Copy the closest file in `src/main/resources/biomeextractor/signatures` and update the affected roles. Add a `BindingProfile` entry selecting the world-loading API (`DIRECT`, `SAVE_HANDLER`, or `WORLD_INFO`) and whether climate values use double fields or float-array methods. New constructor or climate APIs also require changes in `MinecraftBindings`.
+2. **Identify changed classes.** Inspect the JAR with a decompiler, then call the package-private `ReflectionUtil.generateClassSignature(className, loader)` with that JAR's class loader, from a scratch test in `src/test/java/org/tectonicus/biomeextractor` (see `ClasspathUtilTest` for loading a JAR in isolation). Compare the world, biome generator, and any save-handler, world-info, or server-dimension classes against the closest existing profile.
+3. **Register new signatures when needed.** Copy the closest file in `src/main/resources/org/tectonicus/biomeextractor/signatures` and update the affected roles. Add a `BindingProfile` entry selecting the world-loading API (`DIRECT`, `SAVE_HANDLER`, or `WORLD_INFO`) and whether climate values use double fields or float-array methods. New constructor or climate APIs also require changes in `MinecraftBindings`.
 4. **Add integration coverage.** Supply the JAR through a new environment variable and register it as a Gradle integration-test input. Verify negative coordinates, rectangular batches, exported coordinates, and real colormap pixels where available. Test client and server variants separately, then run `gradlew.bat build integrationTest`.
 
 Document the versions actually verified. Keep game JARs and textures external; use world fixtures and numeric expectations for regression tests.
+
+## License
+
+MIT; see [LICENSE](LICENSE). The original Google Code project was released under MIT.

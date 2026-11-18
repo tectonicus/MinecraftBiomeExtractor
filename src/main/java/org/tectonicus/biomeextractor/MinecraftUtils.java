@@ -1,4 +1,4 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.swing.filechooser.FileSystemView;
 
-public class MinecraftUtils
+final class MinecraftUtils
 {
 	public static File findMinecraftDir()
 	{

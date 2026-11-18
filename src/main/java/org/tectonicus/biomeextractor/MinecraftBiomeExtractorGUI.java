@@ -1,4 +1,4 @@
-package biomeextractor;
+package org.tectonicus.biomeextractor;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -21,7 +21,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-public class MinecraftBiomeExtractorGUI extends JPanel
+class MinecraftBiomeExtractorGUI extends JPanel
 {
 	private static final long serialVersionUID = 920622019968842955L;
 	
@@ -98,7 +98,7 @@ public class MinecraftBiomeExtractorGUI extends JPanel
 		// Create our escape key listener
 		log.addKeyListener( new KeyHandler() );
 		
-		log.append("Minecraft Biome Extractor (v1.1.0)"+newline+newline);
+		log.append("Minecraft Biome Extractor (v" + BuildInfo.displayVersion() + ")" + newline + newline);
 		
 		log.repaint();
 		
